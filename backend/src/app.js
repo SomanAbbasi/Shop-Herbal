@@ -18,6 +18,10 @@ import reviewRoutes from './routes/review.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import rateLimit from 'express-rate-limit';
 
+import testRoutes from "./routes/test.routes.js";
+
+
+
 
 const app = express();
 
@@ -46,7 +50,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/products/:id/reviews', reviewRoutes);
 app.use('/api/v1/admin', adminRoutes);  
 
-
+app.use("/api/v1", testRoutes);
 
 
 app.get('/api/v1/health', (req, res) => res.json({ status: true, message: 'API is running' }));
