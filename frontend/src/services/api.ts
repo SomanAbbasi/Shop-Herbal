@@ -1,7 +1,9 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios';
 import { toast } from 'sonner';
 
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+//const API_BASE_URL = 'http://localhost:5000/api/v1';
+const API_BASE_URL = 'https://shop-herbal.vercel.app/api/v1';
+
 
 let accessToken: string | null = null;
 
