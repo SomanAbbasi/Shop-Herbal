@@ -176,7 +176,7 @@ export default function Cart() {
                         <div>
                           <h3 className="font-semibold text-[#111111] truncate">{item.name}</h3>
                           <p className="text-sm text-gray-500">
-                            ${item.pricePerUnit.toFixed(2)} / {item.unit}
+                            Rs. {item.pricePerUnit.toFixed(2)} / {item.unit}
                           </p>
                         </div>
                         <button
@@ -205,7 +205,7 @@ export default function Cart() {
                           </button>
                         </div>
                         <p className="font-semibold text-[#3B8524]">
-                          ${item.subtotal.toFixed(2)}
+                          Rs. {item.subtotal.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -244,10 +244,10 @@ export default function Cart() {
                     <div className="space-y-3">
                       {addresses.map((addr) => (
                         <button
-                          key={addr._id}
+                          key={addr.id}
                           onClick={() => setSelectedAddress(addr)}
                           className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                            selectedAddress?._id === addr._id
+                            selectedAddress?.id === addr.id
                               ? 'border-[#3B8524] bg-[#E6F6CA]/20'
                               : 'border-gray-100 hover:border-gray-200'
                           }`}
@@ -266,7 +266,7 @@ export default function Cart() {
                                 {addr.street}, {addr.city}, {addr.state} {addr.postalCode}
                               </p>
                             </div>
-                            {selectedAddress?._id === addr._id && (
+                            {selectedAddress?.id === addr.id && (
                               <div className="w-5 h-5 bg-[#3B8524] rounded-full flex items-center justify-center">
                                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -332,19 +332,19 @@ export default function Cart() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-24">
               <h3 className="font-semibold text-[#111111] mb-6">Order Summary</h3>
 
-              <div className="space-y-3 mb-6">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Subtotal ({cart.totalItems} items)</span>
-                  <span className="font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="text-gray-500">Subtotal</span>
+                  <span className="font-medium">Rs. {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Tax (5%)</span>
-                  <span className="font-medium">${tax.toFixed(2)}</span>
+                  <span className="font-medium">Rs. {tax.toFixed(2)}</span>
                 </div>
-                <div className="border-t border-gray-100 pt-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#111111]">Total</span>
-                    <span className="text-2xl font-bold text-[#3B8524]">${total.toFixed(2)}</span>
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="text-lg font-semibold text-[#111111]">Total</span>
+                    <span className="text-2xl font-bold text-[#3B8524]">Rs. {total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

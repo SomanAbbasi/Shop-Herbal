@@ -24,6 +24,11 @@ export const blacklistToken = async (jti, ttlSeconds) => {
 };
 
 export const isTokenBlacklisted = async (jti) => {
-  const result = await redis.get(`bl_${jti}`);
-  return result !== null;
+  try {
+    const result = await redis.get(`bl_${jti}`);
+    return result !== null;
+  } catch (err) {
+    console.error('Redis blacklist check failed:', err.message);
+    return false; // fail open — allow request if Redis is down
+  }
 };

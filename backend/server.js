@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import app from './src/app.js';
-import { connectDB } from './src/config/db.js';
+import { prisma, connectDB } from './src/config/db.js';
 import { redis } from './src/config/redis.js';
 import { env } from './src/config/env.js';
 
@@ -11,3 +11,8 @@ const start = async () => {
 };
 
 start();
+
+process.on('SIGINT', async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});

@@ -87,11 +87,11 @@ export default function Footer() {
         <div className="border-t border-[#3B8524]/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Leaf className="w-6 h-6 text-[#3B8524]" />
-            <span className="text-lg font-bold text-[#111111]">Verde Wholesale</span>
+            <span className="text-lg font-bold text-[#111111]">Shop Herbal</span>
           </div>
 
           <p className="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Verde Wholesale. All rights reserved.
+            &copy; {new Date().getFullYear()} Shop Herbal. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4">

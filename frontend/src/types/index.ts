@@ -52,7 +52,7 @@ export interface Address {
 }
 
 export interface Category {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
   parentId: string | null;

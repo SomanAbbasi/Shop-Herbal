@@ -131,7 +131,7 @@ export default function Orders() {
 
               return (
                 <div
-                  key={order._id}
+                  key={order.id}
                   className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   {/* Order Header */}
@@ -178,10 +178,10 @@ export default function Orders() {
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{item.name}</p>
                             <p className="text-xs text-gray-500">
-                              {item.quantity} {item.unit} x ${item.pricePerUnit.toFixed(2)}
-                            </p>
-                          </div>
-                          <p className="text-sm font-medium">${item.subtotal.toFixed(2)}</p>
+                              {item.quantity} {item.unit} x Rs. {item.pricePerUnit.toFixed(2)}
+                              </p>
+                              </div>
+                              <p className="text-sm font-medium">Rs. {item.subtotal.toFixed(2)}</p>
                         </div>
                       ))}
                       {order.items.length > 3 && (
@@ -195,19 +195,19 @@ export default function Orders() {
                     <div className="flex flex-wrap items-center justify-between gap-4 mt-5 pt-4 border-t border-gray-50">
                       <div>
                         <p className="text-xs text-gray-500">Total Amount</p>
-                        <p className="text-xl font-bold text-[#3B8524]">${order.totalAmount.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-[#3B8524]">Rs. {order.totalAmount.toFixed(2)}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {order.status === 'pending' && (
                           <button
-                            onClick={() => handleCancel(order._id)}
+                            onClick={() => handleCancel(order.id)}
                             className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           >
                             Cancel
                           </button>
                         )}
                         <Link
-                          to={`/orders/${order._id}`}
+                          to={`/orders/${order.id}`}
                           className="flex items-center gap-1 px-5 py-2.5 text-sm font-medium bg-[#E6F6CA] text-[#3B8524] rounded-lg hover:bg-[#d4e9b3] transition-colors"
                         >
                           View Details

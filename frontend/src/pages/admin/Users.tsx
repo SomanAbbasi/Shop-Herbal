@@ -161,7 +161,7 @@ export default function AdminUsers() {
               </thead>
               <tbody>
                 {filteredUsers.map((user) => (
-                  <tr key={user._id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <tr key={user.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-[#E6F6CA] rounded-full flex items-center justify-center">
@@ -206,13 +206,13 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        {actionId === user._id ? (
+                        {actionId === user.id ? (
                           <Loader2 className="w-4 h-4 animate-spin text-[#3B8524]" />
                         ) : (
                           <>
                             {user.status === 'pending' && (
                               <button
-                                onClick={() => handleApprove(user._id)}
+                                onClick={() => handleApprove(user.id)}
                                 className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                 title="Approve"
                               >
@@ -221,7 +221,7 @@ export default function AdminUsers() {
                             )}
                             {user.status === 'active' && (
                               <button
-                                onClick={() => handleSuspend(user._id)}
+                                onClick={() => handleSuspend(user.id)}
                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                 title="Suspend"
                               >
@@ -230,7 +230,7 @@ export default function AdminUsers() {
                             )}
                             {user.status === 'suspended' && (
                               <button
-                                onClick={() => handleApprove(user._id)}
+                                onClick={() => handleApprove(user.id)}
                                 className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                 title="Reactivate"
                               >

@@ -29,7 +29,7 @@ export default function ForgotPassword() {
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Leaf className="w-8 h-8 text-[#3B8524]" />
-          <span className="text-2xl font-bold text-[#111111]">Verde</span>
+          <span className="text-2xl font-bold text-[#111111]">Shop Herbal</span>
         </Link>
 
         <div className="bg-white rounded-3xl border border-gray-100 p-8 shadow-xl shadow-gray-100/50">

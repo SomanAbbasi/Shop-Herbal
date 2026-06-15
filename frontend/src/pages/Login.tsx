@@ -15,9 +15,13 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await login(form.email, form.password);
-      toast.success('Login successful!');
-      navigate('/');
+      const userData = await login(form.email, form.password);
+toast.success('Login successful!');
+if (userData?.role === 'admin') {
+  navigate('/admin');
+} else {
+  navigate('/products');
+}
     } catch (err: any) {
       const message = err?.response?.data?.error?.message || 'Login failed';
       toast.error(message);

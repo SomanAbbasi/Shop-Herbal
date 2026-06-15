@@ -12,8 +12,8 @@ export const calculatePrice = (product, quantity) => {
   return Math.round(price * 100) / 100;
 };
 
-export const recalculateCart = (cart) => {
-  cart.totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-  cart.totalAmount = Math.round(cart.items.reduce((sum, item) => sum + item.subtotal, 0) * 100) / 100;
-  return cart;
+export const recalculateTotals = (items) => {
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalAmount = Math.round(items.reduce((sum, item) => sum + item.subtotal, 0) * 100) / 100;
+  return { totalItems, totalAmount };
 };

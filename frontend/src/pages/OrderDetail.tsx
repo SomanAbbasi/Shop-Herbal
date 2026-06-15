@@ -203,10 +203,10 @@ export default function OrderDetail() {
                     <div className="flex-1">
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-gray-500">
-                        {item.quantity} {item.unit} x ${item.pricePerUnit.toFixed(2)}
+                        {item.quantity} {item.unit} x Rs. {item.pricePerUnit.toFixed(2)}
                       </p>
                     </div>
-                    <p className="font-semibold">${item.subtotal.toFixed(2)}</p>
+                    <p className="font-semibold">Rs. {item.subtotal.toFixed(2)}</p>
                   </div>
                 ))}
               </div>
@@ -230,22 +230,22 @@ export default function OrderDetail() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Subtotal</span>
-                  <span className="font-medium">${order.subtotal.toFixed(2)}</span>
+                  <span className="font-medium">Rs. {order.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Tax (5%)</span>
-                  <span className="font-medium">${order.taxAmount.toFixed(2)}</span>
+                  <span className="font-medium">Rs. {order.taxAmount.toFixed(2)}</span>
                 </div>
                 {order.discountAmount > 0 && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-500">Discount</span>
-                    <span className="font-medium text-green-600">-${order.discountAmount.toFixed(2)}</span>
+                    <span className="font-medium text-green-600">-Rs. {order.discountAmount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="border-t border-gray-100 pt-3">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">Total</span>
-                    <span className="text-xl font-bold text-[#3B8524]">${order.totalAmount.toFixed(2)}</span>
+                    <span className="text-xl font-bold text-[#3B8524]">Rs. {order.totalAmount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -256,11 +256,15 @@ export default function OrderDetail() {
                 <MapPin className="w-5 h-5 text-[#3B8524]" />
                 <h3 className="font-semibold text-[#111111]">Shipping Address</h3>
               </div>
-              <p className="text-gray-600 text-sm">
-                {order.shippingAddress.street}<br />
-                {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}<br />
-                {order.shippingAddress.country}
-              </p>
+              {order.shippingAddress ? (
+                <p className="text-gray-600 text-sm">
+                  {order.shippingAddress.street}<br />
+                  {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}<br />
+                  {order.shippingAddress.country}
+                </p>
+              ) : (
+                <p className="text-gray-500 text-sm italic">No shipping address provided</p>
+              )}
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 p-6">

@@ -5,10 +5,15 @@ const API_BASE_URL = 'http://localhost:5000/api/v1';
 //const API_BASE_URL = 'https://shop-herbal.vercel.app/api/v1';
 
 
-let accessToken: string | null = null;
+let accessToken: string | null = localStorage.getItem('accessToken');
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token;
+  if (token) {
+    localStorage.setItem('accessToken', token);
+  } else {
+    localStorage.removeItem('accessToken');
+  }
 };
 
 export const getAccessToken = () => accessToken;
@@ -23,8 +28,9 @@ const api: AxiosInstance = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -36,34 +42,36 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config;
 
-    if (!originalRequest) {
+    if (!originalRequest || (originalRequest as any)._retry) {
       return Promise.reject(error);
     }
 
     if (error.response?.status === 401) {
       const errorData = error.response.data as any;
-      if (errorData?.error?.code === 'TOKEN_EXPIRED') {
+      const errorCode = errorData?.error?.code;
+
+      if (errorCode === 'TOKEN_EXPIRED' || errorCode === 'UNAUTHORIZED') {
+        (originalRequest as any)._retry = true;
         try {
           const refreshResponse = await axios.post(
             `${API_BASE_URL}/auth/refresh`,
             {},
             { withCredentials: true }
           );
-          const newToken = refreshResponse.data.data.accessToken;
-          setAccessToken(newToken);
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return api(originalRequest);
+          
+          if (refreshResponse.data?.status && refreshResponse.data?.data?.accessToken) {
+            const newToken = refreshResponse.data.data.accessToken;
+            setAccessToken(newToken);
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            return api(originalRequest);
+          }
         } catch (refreshError) {
           setAccessToken(null);
-          window.location.href = '/login';
           return Promise.reject(refreshError);
         }
       }
-
-      if (errorData?.error?.code === 'UNAUTHORIZED') {
-        setAccessToken(null);
-        window.location.href = '/login';
-      }
+      
+      setAccessToken(null);
     }
 
     const errorData = error.response?.data as any;

@@ -56,7 +56,7 @@ export default function AdminLayout() {
             >
               <Leaf className="w-6 h-6 text-[#3B8524] shrink-0" />
               {isSidebarOpen && (
-                <span className="text-lg font-bold text-[#111111]">Verde</span>
+                <span className="text-lg font-bold text-[#111111]">Shop Herbal</span>
               )}
             </Link>
             <button

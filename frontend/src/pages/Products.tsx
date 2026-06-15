@@ -176,7 +176,7 @@ export default function Products() {
                 >
                   <option value="">All Categories</option>
                   {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
+                    <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
                   ))}
@@ -198,7 +198,7 @@ export default function Products() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
                 <input
                   type="number"
-                  placeholder="$999"
+                  placeholder="Rs. 999"
                   value={maxPrice}
                   onChange={(e) => { setMaxPrice(e.target.value); setPage(1); }}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
@@ -233,7 +233,7 @@ export default function Products() {
             )}
             {selectedCategory && (
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E6F6CA] text-[#3B8524] text-sm rounded-full">
-                {categories.find((c) => c._id === selectedCategory)?.name || 'Category'}
+                {categories.find((c) => c.id === selectedCategory)?.name || 'Category'}
                 <button onClick={() => { setSelectedCategory(''); setPage(1); }}>
                   <X className="w-3 h-3" />
                 </button>
@@ -275,10 +275,10 @@ export default function Products() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.map((product) => (
                 <div
-                  key={product._id}
+                  key={product.id}
                   className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300"
                 >
-                  <Link to={`/products/${product._id}`} className="block">
+                  <Link to={`/products/${product.id}`} className="block">
                     <div className="relative aspect-square overflow-hidden bg-gray-50">
                       {product.images?.[0] ? (
                         <img
@@ -305,7 +305,7 @@ export default function Products() {
                   </Link>
 
                   <div className="p-5">
-                    <Link to={`/products/${product._id}`}>
+                    <Link to={`/products/${product.id}`}>
                       <h3 className="text-lg font-semibold text-[#111111] group-hover:text-[#3B8524] transition-colors">
                         {product.name}
                       </h3>
@@ -330,15 +330,15 @@ export default function Products() {
 
                     <div className="flex items-end justify-between mt-4">
                       <div>
-                        <p className="text-xl font-bold text-[#3B8524]">
-                          ${product.pricePerUnit.toFixed(2)}
+                        <p className="text-2xl font-bold text-[#3B8524]">
+                          Rs. {product.pricePerUnit.toFixed(2)}
                         </p>
                         <p className="text-xs text-gray-500">
                           per {product.unit} · Min {product.minimumOrderQty}{product.unit}
                         </p>
                       </div>
                       <button
-                        onClick={() => handleAddToCart(product._id, product.minimumOrderQty)}
+                        onClick={() => handleAddToCart(product.id, product.minimumOrderQty)}
                         disabled={product.stock === 0}
                         className="p-2.5 bg-[#3B8524] text-white rounded-xl hover:bg-[#2d6b1b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >

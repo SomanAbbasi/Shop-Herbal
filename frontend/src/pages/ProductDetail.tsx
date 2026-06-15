@@ -57,7 +57,7 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     if (!product) return;
     try {
-      await addToCart(product._id, quantity);
+      await addToCart(product.id, quantity);
     } catch {
       toast.error('Please login to add items to cart');
     }
@@ -191,7 +191,7 @@ export default function ProductDetail() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-8">
               <div className="flex items-baseline gap-2 mb-4">
                 <span className="text-4xl font-bold text-[#3B8524]">
-                  ${getBulkPrice().toFixed(2)}
+                  Rs. {getBulkPrice().toFixed(2)}
                 </span>
                 <span className="text-gray-500">/ {product.unit}</span>
               </div>
@@ -202,7 +202,7 @@ export default function ProductDetail() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-4 py-2.5 bg-[#E6F6CA]/30 rounded-lg">
                       <span className="text-sm">{product.minimumOrderQty}+ {product.unit}</span>
-                      <span className="text-sm font-medium">${product.pricePerUnit.toFixed(2)}</span>
+                      <span className="text-sm font-medium">Rs. {product.pricePerUnit.toFixed(2)}</span>
                     </div>
                     {product.bulkPricingTiers.map((tier, i) => (
                       <div
@@ -219,7 +219,7 @@ export default function ProductDetail() {
                           )}
                           <span className="text-sm">{tier.minQty}+ {product.unit}</span>
                         </div>
-                        <span className="text-sm font-medium">${tier.pricePerUnit.toFixed(2)}</span>
+                        <span className="text-sm font-medium">Rs. {tier.pricePerUnit.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -256,7 +256,7 @@ export default function ProductDetail() {
               <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                 <div>
                   <p className="text-sm text-gray-500">Total</p>
-                  <p className="text-2xl font-bold text-[#111111]">${totalPrice.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-[#111111]">Rs. {totalPrice.toFixed(2)}</p>
                 </div>
                 <button
                   onClick={handleAddToCart}
@@ -348,7 +348,7 @@ export default function ProductDetail() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Price per Unit</p>
-                  <p className="font-medium text-[#3B8524]">${product.pricePerUnit.toFixed(2)}</p>
+                  <p className="font-medium text-[#3B8524]">Rs. {product.pricePerUnit.toFixed(2)}</p>
                 </div>
               </div>
               <div className="mt-6 pt-6 border-t border-gray-100">
@@ -366,7 +366,7 @@ export default function ProductDetail() {
               ) : (
                 reviews.map((review) => (
                   <div
-                    key={review._id}
+                    key={review.id}
                     className="bg-white rounded-2xl border border-gray-100 p-6"
                   >
                     <div className="flex items-center justify-between mb-3">

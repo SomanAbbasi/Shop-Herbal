@@ -25,18 +25,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAdmin = user?.role === 'admin';
 
   const refreshUser = useCallback(async () => {
+    setIsLoading(true);
     try {
       const token = getAccessToken();
       if (!token) {
+        setUser(null);
         setIsLoading(false);
         return;
       }
       const response = await userService.getProfile();
       if (response.status) {
         setUser(response.data);
+      } else {
+        setUser(null);
       }
-    } catch {
+    } catch (error) {
       setAccessToken(null);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await authService.login({ email, password });
-    if (response.status) {
+    if (response.status && response.data?.user) {
       setUser(response.data.user);
     }
   };
@@ -57,14 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await authService.register(data);
   };
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await authService.logout();
     } finally {
       setAccessToken(null);
       setUser(null);
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider

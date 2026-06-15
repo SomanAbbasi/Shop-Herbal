@@ -124,7 +124,7 @@ export default function AdminOrders() {
               </thead>
               <tbody>
                 {filteredOrders.map((order) => (
-                  <tr key={order._id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                     <td className="px-6 py-4">
                       <span className="font-medium text-sm">{order.invoiceNumber}</span>
                     </td>
@@ -132,7 +132,7 @@ export default function AdminOrders() {
                       {order.items.length} items
                     </td>
                     <td className="px-6 py-4 font-medium">
-                      ${order.totalAmount.toFixed(2)}
+                      Rs. {order.totalAmount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -155,13 +155,13 @@ export default function AdminOrders() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        {updatingId === order._id ? (
+                        {updatingId === order.id ? (
                           <Loader2 className="w-4 h-4 animate-spin text-[#3B8524]" />
                         ) : (
                           <div className="relative">
                             <select
                               value={order.status}
-                              onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                              onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
                               className="appearance-none pl-3 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30 cursor-pointer bg-white"
                             >
                               {statusOptions.map((s) => (

@@ -1,75 +1,74 @@
-import Order from '../models/Order.js';
-import Product from '../models/Product.js';
-import User from '../models/User.js';
+import { prisma } from '../config/db.js';
 import { successResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 
-// Aggregates key business metrics for admin dashboard overview
 export const getDashboard = asyncHandler(async (req, res) => {
   const [
     totalOrders,
-    pendingApprovals,
+    suspendedUsers,
     lowStockProducts,
     recentOrders,
     revenueData,
   ] = await Promise.all([
-    Order.countDocuments(),
-    User.countDocuments({ status: 'pending' }),
-    Product.countDocuments({ stock: { $lte: 10 }, isActive: true }),
-    Order.find().sort({ createdAt: -1 }).limit(5),
-    Order.aggregate([
-      { $match: { paymentStatus: 'paid' } },
-      { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } },
-    ]),
+    prisma.order.count(),
+    prisma.user.count({ where: { status: 'suspended' } }),
+    prisma.product.count({ where: { stock: { lte: 10 }, isActive: true } }),
+    prisma.order.findMany({ orderBy: { createdAt: 'desc' }, take: 5, include: { items: true } }),
+    prisma.order.aggregate({
+      where: { paymentStatus: 'paid' },
+      _sum: { totalAmount: true },
+    }),
   ]);
 
   return successResponse(res, {
     totalOrders,
-    totalRevenue: revenueData[0]?.totalRevenue || 0,
-    pendingApprovals,
+    totalRevenue: revenueData._sum.totalAmount || 0,
+    pendingApprovals: suspendedUsers,
     lowStockProducts,
     recentOrders,
   });
 });
 
-// Sales report grouped by day using aggregation pipeline
 export const getSalesReport = asyncHandler(async (req, res) => {
   const { startDate, endDate } = req.query;
 
-  const match = { paymentStatus: 'paid' };
+  const where = { paymentStatus: 'paid' };
   if (startDate || endDate) {
-    match.createdAt = {};
-    if (startDate) match.createdAt.$gte = new Date(startDate);
-    if (endDate) match.createdAt.$lte = new Date(endDate);
+    where.createdAt = {};
+    if (startDate) where.createdAt.gte = new Date(startDate);
+    if (endDate) where.createdAt.lte = new Date(endDate);
   }
 
-  const report = await Order.aggregate([
-    { $match: match },
-    {
-      $group: {
-        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-        totalOrders: { $sum: 1 },
-        totalRevenue: { $sum: '$totalAmount' },
-      },
-    },
-    { $sort: { _id: -1 } },
-  ]);
+  const orders = await prisma.order.findMany({
+    where,
+    select: { createdAt: true, totalAmount: true },
+  });
+
+  // Group by date manually since Prisma groupBy can't truncate dates on SQLite/Postgres easily
+  const grouped = {};
+  for (const order of orders) {
+    const date = order.createdAt.toISOString().split('T')[0];
+    if (!grouped[date]) grouped[date] = { totalOrders: 0, totalRevenue: 0 };
+    grouped[date].totalOrders += 1;
+    grouped[date].totalRevenue += order.totalAmount;
+  }
+
+  const report = Object.entries(grouped)
+    .map(([date, data]) => ({ _id: date, ...data }))
+    .sort((a, b) => b._id.localeCompare(a._id));
 
   return successResponse(res, report);
 });
 
-// Inventory report showing current stock levels
 export const getInventoryReport = asyncHandler(async (req, res) => {
-  const products = await Product.find({ isActive: true })
-    .select('name sku unit stock minimumOrderQty')
-    .sort({ stock: 1 });
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    select: { name: true, sku: true, unit: true, stock: true, minimumOrderQty: true },
+    orderBy: { stock: 'asc' },
+  });
 
   const report = products.map(p => ({
-    name: p.name,
-    sku: p.sku,
-    unit: p.unit,
-    stock: p.stock,
-    minimumOrderQty: p.minimumOrderQty,
+    ...p,
     status: p.stock === 0 ? 'out_of_stock' : p.stock <= 10 ? 'low_stock' : 'in_stock',
   }));
 

@@ -1,30 +1,14 @@
-import mongoose from "mongoose";
-import { env } from "./env.js";
+import { PrismaClient } from '@prisma/client';
 
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = {
-    conn: null,
-    promise: null,
-  };
-}
+export const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL + '&connection_limit=5&pool_timeout=10',
+    },
+  },
+});
 
 export const connectDB = async () => {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(env.mongoUri, {
-      bufferCommands: false,
-      maxPoolSize: 10,
-    });
-  }
-
-  cached.conn = await cached.promise;
-
-  console.log("MongoDB Atlas connected:", cached.conn.connection.host);
-
-  return cached.conn;
+  await prisma.$connect();
+  console.log('PostgreSQL connected via Prisma');
 };

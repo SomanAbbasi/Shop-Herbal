@@ -161,9 +161,9 @@ export default function Home() {
   const filteredProducts = activeCategory === 'All'
     ? displayProducts
     : displayProducts.filter((p: any) => {
-        const catName = typeof p.categoryId === 'object' ? p.categoryId?.name : p.category;
-        return catName === activeCategory;
-      });
+      const catName = typeof p.categoryId === 'object' ? p.categoryId?.name : p.category;
+      return catName === activeCategory;
+    });
 
   return (
     <div className="bg-[#F9FAF5]">
@@ -228,7 +228,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center gap-8 mt-12">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Truck className="w-4 h-4 text-[#3B8524]" />
-              <span>Free shipping over $500</span>
+              <span>Free shipping over Rs. 500</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <ShieldCheck className="w-4 h-4 text-[#3B8524]" />
@@ -272,11 +272,10 @@ export default function Home() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-                  activeCategory === cat
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${activeCategory === cat
                     ? 'bg-[#3B8524] text-white'
                     : 'bg-white text-gray-600 border border-gray-200 hover:border-[#3B8524] hover:text-[#3B8524]'
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -287,10 +286,10 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.slice(0, 6).map((product: any) => (
               <div
-                key={product._id || product.id}
+                key={product.id || product.id}
                 className="product-card group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300"
               >
-                <Link to={`/products/${product._id || product.id}`} className="block">
+                <Link to={`/products/${product.id || product.id}`} className="block">
                   <div className="relative aspect-square overflow-hidden bg-gray-50">
                     <img
                       src={product.images?.[0] || product.image}
@@ -298,15 +297,13 @@ export default function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-[#3B8524]">
-                      {typeof product.categoryId === 'object'
-                        ? product.categoryId?.name
-                        : product.category || 'Organic'}
+                      {product.category?.name || 'Organic'}
                     </div>
                   </div>
                 </Link>
 
                 <div className="p-5">
-                  <Link to={`/products/${product._id || product.id}`}>
+                  <Link to={`/products/${product.id || product.id}`}>
                     <h3 className="text-lg font-semibold text-[#111111] group-hover:text-[#3B8524] transition-colors">
                       {product.name}
                     </h3>
@@ -316,9 +313,8 @@ export default function Home() {
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-4 h-4 ${
-                          i < 4 ? 'text-amber-400 fill-amber-400' : 'text-gray-200'
-                        }`}
+                        className={`w-4 h-4 ${i < 4 ? 'text-amber-400 fill-amber-400' : 'text-gray-200'
+                          }`}
                       />
                     ))}
                     <span className="text-xs text-gray-400 ml-1">(24)</span>
@@ -327,14 +323,14 @@ export default function Home() {
                   <div className="flex items-end justify-between mt-4">
                     <div>
                       <p className="text-2xl font-bold text-[#3B8524]">
-                        ${product.pricePerUnit.toFixed(2)}
+                        Rs. {product.pricePerUnit.toFixed(2)}
                       </p>
                       <p className="text-xs text-gray-500">
                         per {product.unit} &middot; Min {product.minimumOrderQty}{product.unit}
                       </p>
                     </div>
                     <button
-                      onClick={() => handleAddToCart(product._id || product.id)}
+                      onClick={() => handleAddToCart(product.id || product.id)}
                       className="p-3 bg-[#3B8524] text-white rounded-xl hover:bg-[#2d6b1b] transition-colors shadow-lg shadow-[#3B8524]/20"
                     >
                       <ShoppingCart className="w-5 h-5" />
@@ -404,7 +400,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[#111111] mb-4">
-              Why choose Verde?
+              Why choose Shop Herbal?
             </h2>
             <p className="text-gray-500 max-w-xl mx-auto">
               We&apos;re committed to providing the freshest organic produce while supporting sustainable farming practices.
@@ -473,7 +469,7 @@ export default function Home() {
             Ready to stock your shelves?
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join hundreds of businesses that trust Verde for their organic produce supply.
+            Join hundreds of businesses that trust Shop Herbal for their organic produce supply.
             Create an account today and get 10% off your first order.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">

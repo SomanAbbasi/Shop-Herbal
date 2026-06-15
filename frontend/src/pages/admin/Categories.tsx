@@ -50,7 +50,7 @@ export default function AdminCategories() {
 
     try {
       if (editingCategory) {
-        await categoryService.updateCategory(editingCategory._id, formData);
+        await categoryService.updateCategory(editingCategory.id, formData);
         toast.success('Category updated');
       } else {
         await categoryService.createCategory(formData);
@@ -157,9 +157,9 @@ export default function AdminCategories() {
                 >
                   <option value="">None (Top Level)</option>
                   {categories
-                    .filter((c) => c._id !== editingCategory?._id)
+                    .filter((c) => c.id !== editingCategory?.id)
                     .map((cat) => (
-                      <option key={cat._id} value={cat._id}>{cat.name}</option>
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                 </select>
               </div>
@@ -224,7 +224,7 @@ export default function AdminCategories() {
             </thead>
             <tbody>
               {categories.map((cat) => (
-                <tr key={cat._id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <tr key={cat.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-6 py-4">
                     <div className="w-12 h-12 bg-gray-50 rounded-lg overflow-hidden">
                       {cat.image ? (
@@ -240,7 +240,7 @@ export default function AdminCategories() {
                   <td className="px-6 py-4 text-sm text-gray-500">{cat.slug}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {cat.parentId
-                      ? categories.find((c) => c._id === cat.parentId)?.name || '-'
+                      ? categories.find((c) => c.id === cat.parentId)?.name || '-'
                       : '-'}
                   </td>
                   <td className="px-6 py-4">
@@ -252,7 +252,7 @@ export default function AdminCategories() {
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(cat._id)}
+                        onClick={() => handleDelete(cat.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                       >
                         <Trash2 className="w-4 h-4" />

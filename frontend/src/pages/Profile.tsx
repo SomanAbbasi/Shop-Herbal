@@ -107,7 +107,7 @@ export default function Profile() {
     e.preventDefault();
     if (!editingAddress) return;
     try {
-      const res = await userService.updateAddress(editingAddress._id, addressForm);
+      const res = await userService.updateAddress(editingAddress.id, addressForm);
       if (res.status) {
         setAddresses(res.data);
         setEditingAddress(null);
@@ -435,7 +435,7 @@ export default function Profile() {
             ) : (
               addresses.map((addr) => (
                 <div
-                  key={addr._id}
+                  key={addr.id}
                   className={`flex items-start justify-between p-4 rounded-xl border ${
                     addr.isDefault
                       ? 'border-[#3B8524] bg-[#E6F6CA]/20'
@@ -470,7 +470,7 @@ export default function Profile() {
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteAddress(addr._id)}
+                      onClick={() => handleDeleteAddress(addr.id)}
                       className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />

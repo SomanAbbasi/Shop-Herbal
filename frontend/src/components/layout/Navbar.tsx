@@ -60,7 +60,7 @@ export default function Navbar() {
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <Leaf className="w-7 h-7 text-[#3B8524]" />
             <span className="text-xl lg:text-2xl font-bold text-[#111111] tracking-tight">
-              Verde
+              Shop Herbal
             </span>
           </Link>
 

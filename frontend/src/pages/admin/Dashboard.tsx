@@ -51,7 +51,7 @@ export default function AdminDashboard() {
     },
     {
       title: 'Total Revenue',
-      value: `$${(stats?.totalRevenue || 0).toFixed(2)}`,
+      value: `Rs. ${(stats?.totalRevenue || 0).toFixed(2)}`,
       icon: DollarSign,
       color: 'bg-green-50 text-green-600',
       link: '/admin/reports',
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {stats?.recentOrders?.map((order) => (
-                <tr key={order._id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-6 py-4">
                     <span className="font-medium text-sm">{order.invoiceNumber}</span>
                   </td>
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right font-medium">
-                    ${order.totalAmount.toFixed(2)}
+                    Rs. {order.totalAmount.toFixed(2)}
                   </td>
                 </tr>
               )) || (

@@ -94,7 +94,7 @@ export default function AdminProducts() {
 
     try {
       if (editingProduct) {
-        const res = await productService.updateProduct(editingProduct._id, formData);
+        const res = await productService.updateProduct(editingProduct.id, formData);
         if (res.status) {
           toast.success('Product updated');
         }
@@ -144,7 +144,7 @@ export default function AdminProducts() {
       name: product.name,
       slug: product.slug,
       description: product.description,
-      categoryId: typeof product.categoryId === 'object' ? product.categoryId._id : product.categoryId,
+      categoryId: typeof product.categoryId === 'object' ? product.categoryId.id : product.categoryId,
       sku: product.sku,
       unit: product.unit,
       pricePerUnit: product.pricePerUnit.toString(),
@@ -267,7 +267,7 @@ export default function AdminProducts() {
                   >
                     <option value="">Select category</option>
                     {categories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>{cat.name}</option>
+                      <option key={cat.id || cat.id} value={cat.id || cat.id}>{cat.name}</option>
                     ))}
                   </select>
                 </div>
@@ -432,7 +432,7 @@ export default function AdminProducts() {
               </thead>
               <tbody>
                 {products.map((product) => (
-                  <tr key={product._id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <tr key={product.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gray-50 rounded-lg overflow-hidden shrink-0">
@@ -454,7 +454,7 @@ export default function AdminProducts() {
                       {typeof product.categoryId === 'object' ? product.categoryId.name : '-'}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium">
-                      ${product.pricePerUnit.toFixed(2)} / {product.unit}
+                      Rs. {product.pricePerUnit.toFixed(2)} / {product.unit}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`text-sm font-medium ${
@@ -480,7 +480,7 @@ export default function AdminProducts() {
                       <div className="flex items-center justify-end gap-1">
                         {!product.isActive && (
                           <button
-                            onClick={() => handleActivate(product._id)}
+                            onClick={() => handleActivate(product.id)}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                             title="Activate"
                           >
@@ -495,7 +495,7 @@ export default function AdminProducts() {
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(product._id)}
+                          onClick={() => handleDelete(product.id)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >
