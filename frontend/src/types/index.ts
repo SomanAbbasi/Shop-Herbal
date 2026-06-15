@@ -27,7 +27,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -41,7 +41,7 @@ export interface User {
 }
 
 export interface Address {
-  _id: string;
+  id: string;
   label: string;
   street: string;
   city: string;
@@ -62,12 +62,13 @@ export interface Category {
 }
 
 export interface BulkPricingTier {
+  id: string;
   minQty: number;
   pricePerUnit: number;
 }
 
 export interface Product {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
   description: string;
@@ -84,7 +85,7 @@ export interface Product {
 }
 
 export interface Review {
-  _id: string;
+  id: string;
   productId: string;
   userId: string;
   userName: string;
@@ -95,6 +96,7 @@ export interface Review {
 }
 
 export interface CartItem {
+  id: string;
   productId: string;
   name: string;
   image: string;
@@ -105,7 +107,7 @@ export interface CartItem {
 }
 
 export interface Cart {
-  _id: string;
+  id: string;
   userId: string;
   items: CartItem[];
   totalItems: number;
@@ -114,6 +116,7 @@ export interface Cart {
 }
 
 export interface OrderItem {
+  id: string;
   productId: string;
   name: string;
   image: string;
@@ -124,7 +127,7 @@ export interface OrderItem {
 }
 
 export interface Order {
-  _id: string;
+  id: string;
   userId: string;
   items: OrderItem[];
   shippingAddress: {
@@ -155,7 +158,7 @@ export interface DashboardStats {
 }
 
 export interface SalesReport {
-  _id: string;
+  id: string;
   totalOrders: number;
   totalRevenue: number;
 }
