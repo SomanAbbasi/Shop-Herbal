@@ -54,8 +54,8 @@ export const getSalesReport = asyncHandler(async (req, res) => {
   }
 
   const report = Object.entries(grouped)
-    .map(([date, data]) => ({ _id: date, ...data }))
-    .sort((a, b) => b._id.localeCompare(a._id));
+    .map(([date, data]) => ({ id: date, ...data }))
+    .sort((a, b) => b.id.localeCompare(a.id));
 
   return successResponse(res, report);
 });

@@ -1,14 +1,27 @@
 import { PrismaClient } from '@prisma/client';
 
-export const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL + '&connection_limit=5&pool_timeout=10',
+const prismaClientSingleton = () => {
+  return new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
     },
-  },
-});
+  });
+};
+
+const globalForPrisma = globalThis;
+
+export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export const connectDB = async () => {
-  await prisma.$connect();
-  console.log('PostgreSQL connected via Prisma');
+  try {
+    await prisma.$connect();
+    console.log('PostgreSQL connected via Prisma');
+  } catch (error) {
+    console.error('Prisma connection error:', error);
+    process.exit(1);
+  }
 };

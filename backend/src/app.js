@@ -21,6 +21,9 @@ import rateLimit from 'express-rate-limit';
 
 const app = express();
 
+// Trust proxy for Vercel/proxies
+app.set('trust proxy', 1);
+
 // Global rate limit — 100 requests per 15 minutes per IP
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
