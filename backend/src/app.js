@@ -48,7 +48,6 @@ app.use('/api/v1/admin', adminRoutes);
 
 
 
-
 app.get('/api/v1/health', (req, res) => res.json({ status: true, message: 'API is running' }));
 
 
