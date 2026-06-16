@@ -130,18 +130,16 @@ export interface Order {
   id: string;
   userId: string;
   items: OrderItem[];
-  shippingAddress: {
-    street: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  };
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
   subtotal: number;
   taxAmount: number;
   discountAmount: number;
   totalAmount: number;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'payment_failed';
   paymentStatus: 'paid' | 'unpaid';
   paymentMethod: string;
   invoiceNumber: string;

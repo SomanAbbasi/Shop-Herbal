@@ -27,6 +27,7 @@ const statusConfig: Record<string, { color: string; bg: string; icon: typeof Pac
   shipped: { color: 'text-indigo-700', bg: 'bg-indigo-50', icon: Truck },
   delivered: { color: 'text-green-700', bg: 'bg-green-50', icon: CheckCircle },
   cancelled: { color: 'text-red-700', bg: 'bg-red-50', icon: XCircle },
+  payment_failed: { color: 'text-orange-700', bg: 'bg-orange-50', icon: XCircle },
 };
 
 export default function OrderDetail() {

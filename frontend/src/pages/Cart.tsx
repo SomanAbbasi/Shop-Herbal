@@ -236,7 +236,7 @@ export default function Cart() {
           <div className="lg:col-span-2 space-y-4">
             {!isCheckingOut ? (
               <>
-                {cart.items.map((item) => (
+                {cart?.items.map((item) => (
                   <div
                     key={item.productId}
                     className="flex gap-4 bg-white rounded-2xl border border-gray-100 p-4"
