@@ -256,15 +256,11 @@ export default function OrderDetail() {
                 <MapPin className="w-5 h-5 text-[#3B8524]" />
                 <h3 className="font-semibold text-[#111111]">Shipping Address</h3>
               </div>
-              {order.shippingAddress ? (
-                <p className="text-gray-600 text-sm">
-                  {order.shippingAddress.street}<br />
-                  {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}<br />
-                  {order.shippingAddress.country}
-                </p>
-              ) : (
-                <p className="text-gray-500 text-sm italic">No shipping address provided</p>
-              )}
+              <p className="text-gray-600 text-sm">
+                {order.street}<br />
+                {order.city}, {order.state} {order.postalCode}<br />
+                {order.country}
+              </p>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
@@ -272,7 +268,7 @@ export default function OrderDetail() {
                 <CreditCard className="w-5 h-5 text-[#3B8524]" />
                 <h3 className="font-semibold text-[#111111]">Payment</h3>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <span className="text-sm text-gray-600">
                   {order.paymentMethod.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                 </span>
@@ -284,6 +280,16 @@ export default function OrderDetail() {
                   {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
                 </span>
               </div>
+
+              {(order.status === 'pending' || order.status === 'payment_failed') && order.paymentMethod === 'jazz_cash' && (
+                <Link
+                  to="/cart"
+                  state={{ retryOrderId: order.id }}
+                  className="w-full py-2 bg-[#3B8524] text-white rounded-lg text-sm font-medium hover:bg-[#2d6b1b] transition-colors flex items-center justify-center gap-2"
+                >
+                  Pay Now with JazzCash
+                </Link>
+              )}
             </div>
           </div>
         </div>

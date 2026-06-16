@@ -208,7 +208,7 @@ export interface PlaceOrderBody {
     postalCode: string;
     country: string;
   };
-  paymentMethod: 'stripe' | 'bank_transfer' | 'net30' | 'cash_on_delivery';
+  paymentMethod: 'stripe' | 'bank_transfer' | 'net30' | 'cash_on_delivery' | 'jazz_cash';
   notes?: string;
 }
 

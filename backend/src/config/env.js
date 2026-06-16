@@ -1,6 +1,7 @@
 const required = [
   'PORT', 'DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET',
-  'JWT_ACCESS_EXPIRES', 'JWT_REFRESH_EXPIRES', 'REDIS_URL', 'CLIENT_URL'
+  'JWT_ACCESS_EXPIRES', 'JWT_REFRESH_EXPIRES', 'REDIS_URL', 'CLIENT_URL',
+  'JAZZCASH_MERCHANT_ID', 'JAZZCASH_PASSWORD', 'JAZZCASH_INTEGRITY_SALT', 'JAZZCASH_API_URL'
 ];
 
 required.forEach(key => {
@@ -16,4 +17,9 @@ export const env = {
   jwtRefreshExpires: process.env.JWT_REFRESH_EXPIRES,
   redisUrl: process.env.REDIS_URL,
   clientUrl: process.env.CLIENT_URL,
+  jazzcashMerchantId: process.env.JAZZCASH_MERCHANT_ID,
+  jazzcashPassword: process.env.JAZZCASH_PASSWORD,
+  jazzcashIntegritySalt: process.env.JAZZCASH_INTEGRITY_SALT,
+  jazzcashApiUrl: process.env.JAZZCASH_API_URL,
+  nodeEnv: process.env.NODE_ENV || 'development',
 };

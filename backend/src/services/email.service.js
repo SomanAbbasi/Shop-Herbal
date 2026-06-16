@@ -36,7 +36,7 @@ export const sendOrderNotificationToAdmin = async (order) => {
       <h2>New Order Received</h2>
       <p><strong>Invoice:</strong> ${order.invoiceNumber}</p>
       <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-      <p><strong>Shipping To:</strong> ${order.shippingAddress.street}, ${order.shippingAddress.city}</p>
+      <p><strong>Shipping To:</strong> ${order.street}, ${order.city}</p>
       <table border="1" cellpadding="8">
         <tr><th>Product</th><th>Quantity</th><th>Price</th><th>Subtotal</th></tr>
         ${itemsList}

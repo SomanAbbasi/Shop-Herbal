@@ -1,0 +1,35 @@
+
+
+### Variables
+@baseUrl = http://localhost:5000/api/v1
+@contentType = application/json
+
+### 1. Health Check Endpoint
+# Use this to verify your server and Prisma Postgres connection are live
+GET {{baseUrl}}/health HTTP/1.1
+Content-Type: {{contentType}}
+
+###
+
+### 2. Initiate JazzCash Mobile Wallet Payment (Sandbox Bypass Success Test)
+# This uses the official sandbox number '03123456789' to simulate a successful MPIN entry
+POST {{baseUrl}}/payments/jazzcash/initiate HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "orderId": "clx1234567890",
+    "mobileNumber": "03123456789"
+}
+
+###
+
+### 3. Initiate JazzCash Mobile Wallet Payment (Real Number Failure Test)
+# This uses a real number which will trigger a 199 error on the sandbox system 
+# to test your Prisma database error handling and frontend alert parsing.
+POST {{baseUrl}}/payments/jazzcash/initiate HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "orderId": "clx1234567891",
+    "mobileNumber": "03079035614"
+}

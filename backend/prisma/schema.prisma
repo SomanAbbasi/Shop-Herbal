@@ -24,6 +24,7 @@ enum OrderStatus {
   shipped
   delivered
   cancelled
+  payment_failed
 }
 
 enum PaymentStatus {
@@ -37,6 +38,7 @@ enum PaymentMethod {
   bank_transfer
   net30
   cash_on_delivery
+  jazz_cash
 }
 
 // ─── USER ────────────────────────────────────────────
@@ -194,6 +196,7 @@ model Order {
   status          OrderStatus   @default(pending)
   paymentStatus   PaymentStatus @default(unpaid)
   paymentMethod   PaymentMethod
+  transactionId   String?
   notes           String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

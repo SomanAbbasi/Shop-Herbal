@@ -73,6 +73,8 @@ export const placeOrder = asyncHandler(async (req, res) => {
       await tx.cart.update({ where: { id: cart.id }, data: { totalItems: 0, totalAmount: 0 } });
 
       return newOrder;
+    }, {
+      timeout: 15000
     });
 
     sendOrderNotificationToAdmin(order).catch(err => console.error('Admin email failed:', err));

@@ -2,10 +2,21 @@ import axios, { type AxiosInstance, type AxiosError } from 'axios';
 import { toast } from 'sonner';
 
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://shop-herbal.vercel.app/api/v1' : 'http://localhost:5000/api/v1');
+// Determine if we are running on localhost
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
-  console.warn('WARNING: API is pointing to localhost in production build!');
+// API Base URL priority:
+// 1. VITE_API_BASE_URL (if it doesn't point to vercel while on localhost)
+// 2. Automatic Localhost fallback
+// 3. Production default
+const envApiUrl = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = (isLocalhost && (!envApiUrl || envApiUrl.includes('vercel.app')))
+  ? 'http://localhost:5000/api/v1'
+  : (envApiUrl || 'https://shop-herbal.vercel.app/api/v1');
+
+if (import.meta.env.DEV) {
+  console.log('Detected Environment:', isLocalhost ? 'Local' : 'Remote');
+  console.log('API Base URL:', API_BASE_URL);
 }
 
 

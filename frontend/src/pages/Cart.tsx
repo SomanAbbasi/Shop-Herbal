@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { orderService } from '@/services/orderService';
 import { userService } from '@/services/userService';
-import type { Address } from '@/types';
+import type { Address, Order } from '@/types';
 import {
   ShoppingCart,
   Minus,
@@ -18,19 +18,27 @@ import {
   Banknote,
   Calendar,
   Truck,
+  Smartphone,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { initiateJazzCashPayment } from '@/services/paymentService';
 
 export default function Cart() {
   const { cart, fetchCart, updateCartItem, removeCartItem, clearCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const location = useLocation();
+  const retryOrderId = location.state?.retryOrderId;
+
+  const [isCheckingOut, setIsCheckingOut] = useState(!!retryOrderId);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'net30' | 'cash_on_delivery'>('cash_on_delivery');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'net30' | 'cash_on_delivery' | 'jazz_cash'>(retryOrderId ? 'jazz_cash' : 'cash_on_delivery');
   const [orderNotes, setOrderNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [jazzCashMobile, setJazzCashMobile] = useState('');
+  const [jazzCashCNIC, setJazzCashCNIC] = useState('');
+  const [retryOrder, setRetryOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     fetchCart();
@@ -41,6 +49,23 @@ export default function Cart() {
       fetchAddresses();
     }
   }, [isCheckingOut]);
+
+  useEffect(() => {
+    if (retryOrderId) {
+      fetchRetryOrder();
+    }
+  }, [retryOrderId]);
+
+  const fetchRetryOrder = async () => {
+    try {
+      const res = await orderService.getOrder(retryOrderId);
+      if (res.status) {
+        setRetryOrder(res.data);
+      }
+    } catch {
+      toast.error('Failed to load order details for retry');
+    }
+  };
 
   const fetchAddresses = async () => {
     try {
@@ -74,27 +99,81 @@ export default function Cart() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!selectedAddress) {
+    if (!retryOrderId && !selectedAddress) {
       toast.error('Please select a shipping address');
       return;
     }
+
+    if (paymentMethod === 'jazz_cash') {
+      if (!jazzCashMobile || jazzCashMobile.length < 11) {
+        toast.error('Please enter a valid JazzCash mobile number');
+        return;
+      }
+      if (!jazzCashCNIC || jazzCashCNIC.length !== 6) {
+        toast.error('Please enter the last 6 digits of your CNIC');
+        return;
+      }
+    }
+
     setIsLoading(true);
+
+    // If retrying an existing order
+    if (retryOrderId) {
+      try {
+        toast.info('Initiating JazzCash payment...');
+        const paymentRes = await initiateJazzCashPayment(retryOrderId, jazzCashMobile, jazzCashCNIC);
+        if (paymentRes.success) {
+          toast.success('Payment successful! Your order is confirmed.');
+          navigate('/orders');
+        } else {
+          toast.error(paymentRes.message || 'JazzCash payment failed');
+        }
+      } catch (paymentErr: any) {
+        toast.error(paymentErr.message || 'JazzCash payment failed');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
     try {
       const res = await orderService.placeOrder({
         shippingAddress: {
-          street: selectedAddress.street,
-          city: selectedAddress.city,
-          state: selectedAddress.state,
-          postalCode: selectedAddress.postalCode,
-          country: selectedAddress.country,
+          street: selectedAddress!.street,
+          city: selectedAddress!.city,
+          state: selectedAddress!.state,
+          postalCode: selectedAddress!.postalCode,
+          country: selectedAddress!.country,
         },
         paymentMethod,
         notes: orderNotes,
       });
+
       if (res.status) {
-        toast.success('Order placed successfully!');
-        clearCart();
-        navigate('/orders');
+        const order = res.data;
+
+        if (paymentMethod === 'jazz_cash') {
+          toast.info('Initiating JazzCash payment...');
+          try {
+            const paymentRes = await initiateJazzCashPayment(order.id, jazzCashMobile, jazzCashCNIC);
+            if (paymentRes.success) {
+              toast.success(paymentRes.userMessage || 'Payment successful! Your order is confirmed.');
+              clearCart();
+              navigate('/orders');
+            } else {
+              toast.error(paymentRes.userMessage || paymentRes.message || 'JazzCash payment failed');
+              // Optionally navigate to order detail to retry payment
+              navigate(`/orders/${order.id}`);
+            }
+          } catch (paymentErr: any) {
+            toast.error(paymentErr.userMessage || paymentErr.message || 'JazzCash payment failed');
+            navigate(`/orders/${order.id}`);
+          }
+        } else {
+          toast.success('Order placed successfully!');
+          clearCart();
+          navigate('/orders');
+        }
       }
     } catch (err: any) {
       const message = err?.response?.data?.error?.message || 'Failed to place order';
@@ -118,7 +197,7 @@ export default function Cart() {
     );
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (!retryOrderId && (!cart || cart.items.length === 0)) {
     return (
       <div className="min-h-screen bg-[#F9FAF5] flex flex-col items-center justify-center pt-20 px-4">
         <div className="text-center">
@@ -141,9 +220,9 @@ export default function Cart() {
     );
   }
 
-  const subtotal = cart.totalAmount;
-  const tax = subtotal * 0.05;
-  const total = subtotal + tax;
+  const subtotal = retryOrder ? retryOrder.subtotal : (cart?.totalAmount || 0);
+  const tax = retryOrder ? retryOrder.taxAmount : (subtotal * 0.05);
+  const total = retryOrder ? retryOrder.totalAmount : (subtotal + tax);
 
   return (
     <div className="min-h-screen bg-[#F9FAF5] pt-24 pb-16 px-4 sm:px-6 lg:px-8">
@@ -292,6 +371,7 @@ export default function Cart() {
                       { value: 'bank_transfer' as const, label: 'Bank Transfer', icon: CreditCard },
                       { value: 'net30' as const, label: 'Net 30', icon: Calendar },
                       { value: 'stripe' as const, label: 'Stripe', icon: CreditCard },
+                      { value: 'jazz_cash' as const, label: 'JazzCash', icon: Smartphone },
                     ].map((method) => (
                       <button
                         key={method.value}
@@ -307,6 +387,35 @@ export default function Cart() {
                       </button>
                     ))}
                   </div>
+
+                  {paymentMethod === 'jazz_cash' && (
+                    <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">JazzCash Mobile Number</label>
+                        <input
+                          type="text"
+                          value={jazzCashMobile}
+                          onChange={(e) => setJazzCashMobile(e.target.value)}
+                          placeholder="03xxxxxxxxx"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Last 6 Digits of CNIC</label>
+                        <input
+                          type="text"
+                          value={jazzCashCNIC}
+                          onChange={(e) => setJazzCashCNIC(e.target.value)}
+                          placeholder="123456"
+                          maxLength={6}
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 italic">
+                        You will receive a prompt on your phone to enter your JazzCash PIN.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Order Notes */}
