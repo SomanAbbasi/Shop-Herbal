@@ -1,17 +1,21 @@
 import express from 'express';
-import { initiateJazzCashPayment } from '../controllers/payments/jazzcash/jazzcashController.js';
+import { initiateJazzCashPayment, handleJazzCashCallback } from '../controllers/payments/jazzcash/jazzcashController.js';
 import { authenticate } from '../middleware/authenticate.js';
 
 const router = express.Router();
-
-// All payment routes are protected
-router.use(authenticate);
 
 /**
  * @route   POST /api/v1/payments/jazzcash/initiate
  * @desc    Initiate JazzCash Mobile Wallet payment
  * @access  Private
  */
-router.post('/jazzcash/initiate', initiateJazzCashPayment);
+router.post('/jazzcash/initiate', authenticate, initiateJazzCashPayment);
+
+/**
+ * @route   POST /api/v1/payments/jazzcash/callback
+ * @desc    JazzCash callback notification handler
+ * @access  Public (Verification handled via Secure Hash)
+ */
+router.post('/jazzcash/callback', handleJazzCashCallback);
 
 export default router;

@@ -1,9 +1,7 @@
-
-
 ### Variables
 @baseUrl = http://localhost:5000/api/v1
 @contentType = application/json
-
+@authToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA5YWZhNjIzLTVjODEtNGM3NC04MzNhLWEyMzNhMmI5YTRjNSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc4MTYwMTI0OSwiZXhwIjoxNzgxNjAyMTQ5LCJqdGkiOiI0MmU5OTc4Mi03OWQyLTRhYWItYmIyOC0wNzljMDQ3OGJlNWQifQ.cHMOgaCFQYe3YYovCaJJc5DShqWRMN7vlCunDxnrw3w
 ### 1. Health Check Endpoint
 # Use this to verify your server and Prisma Postgres connection are live
 GET {{baseUrl}}/health HTTP/1.1
@@ -11,25 +9,40 @@ Content-Type: {{contentType}}
 
 ###
 
-### 2. Initiate JazzCash Mobile Wallet Payment (Sandbox Bypass Success Test)
-# This uses the official sandbox number '03123456789' to simulate a successful MPIN entry
-POST {{baseUrl}}/payments/jazzcash/initiate HTTP/1.1
+### 2. Login (To get your Bearer Token)
+# Replace with valid credentials from your database
+POST {{baseUrl}}/auth/login HTTP/1.1
 Content-Type: {{contentType}}
 
 {
-    "orderId": "clx1234567890",
+    "email": "somanabbasi305@gmail.com",
+    "password": "Password@123"
+}
+
+###
+
+### 3. Initiate JazzCash Mobile Wallet Payment (Sandbox Bypass Success Test)
+# This uses the official sandbox number '03123456789' to simulate a successful MPIN entry.
+# We use a real orderId found in your database: e687a20d-f523-46e6-9d59-10c7b6332370
+POST {{baseUrl}}/payments/jazzcash/initiate HTTP/1.1
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+    "orderId": "e687a20d-f523-46e6-9d59-10c7b6332370",
     "mobileNumber": "03123456789"
 }
 
 ###
 
-### 3. Initiate JazzCash Mobile Wallet Payment (Real Number Failure Test)
+### 4. Initiate JazzCash Mobile Wallet Payment (Real Number Failure Test)
 # This uses a real number which will trigger a 199 error on the sandbox system 
 # to test your Prisma database error handling and frontend alert parsing.
 POST {{baseUrl}}/payments/jazzcash/initiate HTTP/1.1
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
-    "orderId": "clx1234567891",
+    "orderId": "e687a20d-f523-46e6-9d59-10c7b6332370",
     "mobileNumber": "03079035614"
 }

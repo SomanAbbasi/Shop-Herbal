@@ -13,9 +13,17 @@ export const initiateJazzCashPayment = async (orderId: string, mobileNumber: str
             mobileNumber,
             cnic,
         });
+        
         return response.data;
     } catch (error: any) {
-        throw error.response?.data || error;
+        // Return standard error object for frontend consumption
+        const errorData = error.response?.data;
+        throw {
+            success: false,
+            message: errorData?.message || 'Payment initiation failed',
+            userMessage: errorData?.userMessage || 'Something went wrong. Please try again.',
+            responseCode: errorData?.responseCode
+        };
     }
 };
 
