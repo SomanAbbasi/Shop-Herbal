@@ -1,7 +1,10 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios';
 import { toast } from 'sonner';
+import API_URL from '../config/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+if (import.meta.env.DEV || window.location.hostname !== 'localhost') {
+  console.log("API URL:", API_URL);
+}
 
 let accessToken: string | null = localStorage.getItem('accessToken');
 
@@ -17,7 +20,7 @@ export const setAccessToken = (token: string | null) => {
 export const getAccessToken = () => accessToken;
 
 const api: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -52,7 +55,7 @@ api.interceptors.response.use(
         (originalRequest as any)._retry = true;
         try {
           const refreshResponse = await axios.post(
-            `${API_BASE_URL}/auth/refresh`,
+            `${API_URL}/auth/refresh`,
             {},
             { withCredentials: true }
           );
