@@ -112,7 +112,7 @@ export default function AdminOrderDetail({ orderId, onClose }: AdminOrderDetailP
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase font-medium">Name</p>
-                      <p className="text-sm font-medium">{(order as any).user?.name || 'N/A'}</p>
+                      <p className="text-sm font-medium">{order.user?.name || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -121,7 +121,7 @@ export default function AdminOrderDetail({ orderId, onClose }: AdminOrderDetailP
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase font-medium">Email</p>
-                      <p className="text-sm font-medium">{(order as any).user?.email || 'N/A'}</p>
+                      <p className="text-sm font-medium">{order.user?.email || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export default function AdminOrderDetail({ orderId, onClose }: AdminOrderDetailP
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase font-medium">Phone</p>
-                      <p className="text-sm font-medium">{(order as any).user?.phone || 'N/A'}</p>
+                      <p className="text-sm font-medium">{order.user?.phone || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -139,7 +139,7 @@ export default function AdminOrderDetail({ orderId, onClose }: AdminOrderDetailP
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase font-medium">Business</p>
-                      <p className="text-sm font-medium">{(order as any).user?.businessName || 'N/A'}</p>
+                      <p className="text-sm font-medium">{order.user?.businessName || 'N/A'}</p>
                     </div>
                   </div>
                 </div>

@@ -129,6 +129,12 @@ export interface OrderItem {
 export interface Order {
   id: string;
   userId: string;
+  user?: {
+    name: string;
+    email: string;
+    phone: string;
+    businessName: string;
+  };
   items: OrderItem[];
   street: string;
   city: string;
@@ -143,6 +149,7 @@ export interface Order {
   paymentStatus: 'paid' | 'unpaid';
   paymentMethod: string;
   invoiceNumber: string;
+  transactionId?: string;
   notes: string;
   createdAt: string;
 }

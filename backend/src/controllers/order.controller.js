@@ -93,7 +93,10 @@ export const listOrders = asyncHandler(async (req, res) => {
   const total = await prisma.order.count({ where });
   const orders = await prisma.order.findMany({
     where,
-    include: { items: true },
+    include: { 
+      items: true,
+      user: req.user.role === 'admin' ? { select: { name: true, email: true, phone: true, businessName: true } } : false
+    },
     orderBy: { createdAt: 'desc' },
     skip: (page - 1) * Number(limit),
     take: Number(limit),
@@ -107,7 +110,13 @@ export const getOrder = asyncHandler(async (req, res) => {
     ? { id: req.params.id }
     : { id: req.params.id, userId: req.user.id };
 
-  const order = await prisma.order.findFirst({ where, include: { items: true } });
+  const order = await prisma.order.findFirst({ 
+    where, 
+    include: { 
+      items: true,
+      user: req.user.role === 'admin' ? { select: { name: true, email: true, phone: true, businessName: true } } : false
+    } 
+  });
   if (!order) return errorResponse(res, 'ORDER_NOT_FOUND', 'Order not found', 404);
   return successResponse(res, order);
 });
