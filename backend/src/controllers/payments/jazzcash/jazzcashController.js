@@ -3,10 +3,7 @@ import { prisma } from '../../../config/db.js';
 import { asyncHandler } from '../../../middleware/asyncHandler.js';
 import { generateSecureHash, mapResponseToUserMessage } from './jazzcashHelper.js';
 
-const JAZZCASH_SANDBOX_URL = "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/2.0/Purchase/DoMWalletTransaction";
-const INTEGRITY_SALT = "79064xg37u";
-const MERCHANT_ID = "MC802531";
-const PASSWORD = "0085626w80";
+
 
 /**
  * Initiates a JazzCash Mobile Wallet transaction (v1.1 MWALLET)
