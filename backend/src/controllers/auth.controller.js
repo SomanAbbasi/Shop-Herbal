@@ -38,8 +38,20 @@ export const register = asyncHandler(async (req, res) => {
   try {
     await sendEmail({
       to: email,
-      subject: 'Verify your email',
-      html: `<p>Click <a href="${verifyUrl}">here</a> to verify your email. Expires in 24 hours.</p>`,
+      subject: 'Verify your email — Organic Wholesale',
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #3B8524; text-align: center;">Welcome to Organic Wholesale!</h2>
+          <p>Hi ${name},</p>
+          <p>Thank you for registering with Organic Wholesale. To activate your account and start shopping, please verify your email address by clicking the button below:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verifyUrl}" style="background-color: #3B8524; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email Address</a>
+          </div>
+          <p>This link will expire in 24 hours. If you did not create an account, please ignore this email.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="color: #888; font-size: 12px; text-align: center;">&copy; 2026 Organic Wholesale. All rights reserved.</p>
+        </div>
+      `,
     });
   } catch (emailErr) {
     await prisma.user.delete({ where: { id: user.id } });
