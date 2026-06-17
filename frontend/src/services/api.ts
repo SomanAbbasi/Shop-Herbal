@@ -1,24 +1,7 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios';
 import { toast } from 'sonner';
 
-
-// Determine if we are running on localhost
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-// API Base URL priority:
-// 1. VITE_API_BASE_URL (if it doesn't point to vercel while on localhost)
-// 2. Automatic Localhost fallback
-// 3. Production default
-const envApiUrl = import.meta.env.VITE_API_BASE_URL;
-const API_BASE_URL = (isLocalhost && (!envApiUrl || envApiUrl.includes('vercel.app')))
-  ? 'http://localhost:5000/api/v1'
-  : (envApiUrl || 'https://shop-herbal.vercel.app/api/v1');
-
-if (import.meta.env.DEV) {
-  console.log('Detected Environment:', isLocalhost ? 'Local' : 'Remote');
-  console.log('API Base URL:', API_BASE_URL);
-}
-
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 let accessToken: string | null = localStorage.getItem('accessToken');
 
@@ -90,7 +73,9 @@ api.interceptors.response.use(
     }
 
     const errorData = error.response?.data as any;
-    if (errorData?.error?.message) {
+    if (errorData?.message) {
+      toast.error(errorData.message);
+    } else if (errorData?.error?.message) {
       toast.error(errorData.error.message);
     } else if (error.message) {
       toast.error(error.message);

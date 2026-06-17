@@ -4,9 +4,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
-// import mongoSanitize from 'express-mongo-sanitize';
-// import hpp from 'hpp';
-import { errorHandler } from './middleware/errorHandler.js';
+import { allowedOrigins } from './config/origins.js';
+import errorHandler from './middleware/error.js';
 import authRoutes from './routes/auth.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import productRoutes from './routes/product.routes.js';
@@ -37,25 +36,37 @@ const globalLimiter = rateLimit({
 }); 
 app.use(globalLimiter);
 app.use(helmet());
-const allowedOrigins = [env.clientUrl, 'http://localhost:3000', 'http://127.0.0.1:3000'].filter(Boolean);
 
-app.use(cors({ 
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || env.nodeEnv === 'development') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }, 
-  credentials: true 
-}));
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+
+      const normalized = origin.replace(/\/$/, "");
+
+      if (allowedOrigins.includes(normalized)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked: ${origin}`));
+    },
+
+    credentials: true,
+
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.options("*", cors());
+
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(morgan('dev'));
-// app.use(mongoSanitize());
-// app.use(hpp());
+
+app.get("/health", (req, res) => res.json({ ok: true }));
+
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/products', productRoutes);
@@ -65,12 +76,6 @@ app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/products/:id/reviews', reviewRoutes);
 app.use('/api/v1/admin', adminRoutes);  
-
-
-
-app.get('/api/v1/health', (req, res) => res.json({ status: true, message: 'API is running' }));
-
-
 
 app.use(errorHandler);
 

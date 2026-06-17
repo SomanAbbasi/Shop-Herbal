@@ -1,13 +1,20 @@
 const required = [
   'PORT', 'DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET',
-  'JWT_ACCESS_EXPIRES', 'JWT_REFRESH_EXPIRES', 'REDIS_URL', 'CLIENT_URL',
+  'JWT_ACCESS_EXPIRES', 'JWT_REFRESH_EXPIRES', 'REDIS_URL',
   'JAZZCASH_MERCHANT_ID', 'JAZZCASH_PASSWORD', 'JAZZCASH_INTEGRITY_SALT',
   'JAZZCASH_RETURN_URL', 'JAZZCASH_API_URL', 'NODE_ENV'
 ];
 
 required.forEach(key => {
-  if (!process.env[key]) throw new Error(`Missing env variable: ${key}`);
+  if (!process.env[key]) {
+    throw new Error(`CRITICAL ERROR: Missing environment variable: ${key}`);
+  }
 });
+
+// Extra check for Database URL specifically
+if (!process.env.DATABASE_URL.startsWith('postgresql://') && !process.env.DATABASE_URL.startsWith('postgres://')) {
+  throw new Error('CRITICAL ERROR: DATABASE_URL must be a PostgreSQL connection string');
+}
 
 export const env = {
   port: process.env.PORT,
@@ -17,7 +24,6 @@ export const env = {
   jwtAccessExpires: process.env.JWT_ACCESS_EXPIRES,
   jwtRefreshExpires: process.env.JWT_REFRESH_EXPIRES,
   redisUrl: process.env.REDIS_URL,
-  clientUrl: process.env.CLIENT_URL,
   jazzcashMerchantId: process.env.JAZZCASH_MERCHANT_ID,
   jazzcashPassword: process.env.JAZZCASH_PASSWORD,
   jazzcashIntegritySalt: process.env.JAZZCASH_INTEGRITY_SALT,
