@@ -26,17 +26,7 @@ const app = express();
 // Trust proxy for Vercel/proxies
 app.set('trust proxy', 1);
 
-// Global rate limit — 100 requests per 15 minutes per IP
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 1000,
-  message: { status: false, error: { code: 'TOO_MANY_REQUESTS', message: 'Too many requests, please try again later' } },
-  standardHeaders: true,
-  legacyHeaders: false,
-}); 
-app.use(globalLimiter);
-app.use(helmet());
-
+// 1. CORS FIRST (Ensure headers are set even if later middleware fails)
 app.use(
   cors({
     origin(origin, callback) {
@@ -61,9 +51,23 @@ app.use(
 
 app.options("*", cors());
 
+// 2. Security and Logging
+app.use(helmet());
+app.use(morgan('dev'));
+
+// 3. Global rate limit
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  message: { status: false, error: { code: 'TOO_MANY_REQUESTS', message: 'Too many requests, please try again later' } },
+  standardHeaders: true,
+  legacyHeaders: false,
+}); 
+app.use(globalLimiter);
+
+// 4. Request Parsing
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
-app.use(morgan('dev'));
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 

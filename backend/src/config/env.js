@@ -1,5 +1,5 @@
 const required = [
-  'PORT', 'DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET',
+  'DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET',
   'JWT_ACCESS_EXPIRES', 'JWT_REFRESH_EXPIRES', 'REDIS_URL',
   'JAZZCASH_MERCHANT_ID', 'JAZZCASH_PASSWORD', 'JAZZCASH_INTEGRITY_SALT',
   'JAZZCASH_RETURN_URL', 'JAZZCASH_API_URL', 'NODE_ENV'
@@ -12,12 +12,12 @@ required.forEach(key => {
 });
 
 // Extra check for Database URL specifically
-if (!process.env.DATABASE_URL.startsWith('postgresql://') && !process.env.DATABASE_URL.startsWith('postgres://')) {
+if (process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('postgresql://') && !process.env.DATABASE_URL.startsWith('postgres://')) {
   throw new Error('CRITICAL ERROR: DATABASE_URL must be a PostgreSQL connection string');
 }
 
 export const env = {
-  port: process.env.PORT,
+  port: process.env.PORT || 5000,
   databaseUrl: process.env.DATABASE_URL,
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
