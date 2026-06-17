@@ -1,13 +1,31 @@
-const required = [
-  'DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET',
-  'JWT_ACCESS_EXPIRES', 'JWT_REFRESH_EXPIRES', 'REDIS_URL',
-  'JAZZCASH_MERCHANT_ID', 'JAZZCASH_PASSWORD', 'JAZZCASH_INTEGRITY_SALT',
-  'JAZZCASH_RETURN_URL', 'JAZZCASH_API_URL', 'NODE_ENV'
+const critical = [
+  'DATABASE_URL', 
+  'JWT_ACCESS_SECRET', 
+  'JWT_REFRESH_SECRET',
+  'JWT_ACCESS_EXPIRES', 
+  'JWT_REFRESH_EXPIRES', 
+  'REDIS_URL'
 ];
 
-required.forEach(key => {
+const optional = [
+  'JAZZCASH_MERCHANT_ID', 
+  'JAZZCASH_PASSWORD', 
+  'JAZZCASH_INTEGRITY_SALT',
+  'JAZZCASH_RETURN_URL', 
+  'JAZZCASH_API_URL'
+];
+
+// Check critical variables
+critical.forEach(key => {
   if (!process.env[key]) {
-    throw new Error(`CRITICAL ERROR: Missing environment variable: ${key}`);
+    throw new Error(`CRITICAL ERROR: Missing required environment variable: ${key}`);
+  }
+});
+
+// Log warnings for missing optional variables
+optional.forEach(key => {
+  if (!process.env[key]) {
+    console.warn(`WARNING: Optional environment variable missing: ${key}. Some features may not work.`);
   }
 });
 
