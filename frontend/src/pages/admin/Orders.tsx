@@ -5,9 +5,10 @@ import {
   Loader2,
   Search,
   ChevronDown,
-
+  Eye,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import AdminOrderDetail from '@/components/admin/AdminOrderDetail';
 
 const statusOptions = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 
@@ -28,6 +29,7 @@ export default function AdminOrders() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -154,7 +156,14 @@ export default function AdminOrders() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-3">
+                        <button
+                          onClick={() => setSelectedOrderId(order.id)}
+                          className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all text-gray-500 hover:text-[#3B8524]"
+                          title="View Invoice"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
                         {updatingId === order.id ? (
                           <Loader2 className="w-4 h-4 animate-spin text-[#3B8524]" />
                         ) : (
@@ -201,6 +210,13 @@ export default function AdminOrders() {
             </div>
           )}
         </div>
+      )}
+
+      {selectedOrderId && (
+        <AdminOrderDetail
+          orderId={selectedOrderId}
+          onClose={() => setSelectedOrderId(null)}
+        />
       )}
     </div>
   );
