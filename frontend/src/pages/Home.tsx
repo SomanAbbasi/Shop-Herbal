@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { productService } from '@/services/productService';
 import { categoryService } from '@/services/categoryService';
-import type { Product } from '@/types';
+import type { Product, Category } from '@/types';
 import {
   Search,
   ArrowRight,
@@ -24,19 +24,11 @@ import { toast } from 'sonner';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const FEATURED_PRODUCTS = [
-  { id: 'lime', name: 'Lime', slug: 'lime', image: '/images/prod-lime.jpg', pricePerUnit: 3, minQty: 10, unit: 'kg', category: 'Fresh Fruit' },
-  { id: 'papaya', name: 'Papaya', slug: 'papaya', image: '/images/prod-papaya.jpg', pricePerUnit: 5, minQty: 5, unit: 'kg', category: 'Fresh Fruit' },
-  { id: 'lemon', name: 'Lemon', slug: 'lemon', image: '/images/prod-lemon.jpg', pricePerUnit: 4, minQty: 8, unit: 'kg', category: 'Fresh Fruit' },
-  { id: 'avocado', name: 'Avocado', slug: 'avocado', image: '/images/prod-avocado.jpg', pricePerUnit: 6, minQty: 6, unit: 'kg', category: 'Fresh Fruit' },
-  { id: 'tomato', name: 'Tomato', slug: 'tomato', image: '/images/prod-tomato.jpg', pricePerUnit: 2.5, minQty: 12, unit: 'kg', category: 'Fresh Vegetables' },
-  { id: 'carrot', name: 'Carrot', slug: 'carrot', image: '/images/prod-carrot.jpg', pricePerUnit: 1.8, minQty: 15, unit: 'kg', category: 'Fresh Vegetables' },
-];
-
 const BRANDS = ['Whole Foods', 'Fresh Market', 'Natural Grocers', 'Sprouts', 'Trader Joes', 'Kroger'];
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
@@ -50,16 +42,19 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes] = await Promise.all([
+        const [productsRes, categoriesRes] = await Promise.all([
           productService.listProducts({ limit: 8 }),
           categoryService.listCategories(),
         ]);
+        
         if (productsRes.status) {
           setProducts(productsRes.data.data);
         }
-      } catch {
-        // Fallback to featured products
-        setProducts([]);
+        if (categoriesRes.status) {
+          setCategories(categoriesRes.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
       } finally {
         setIsLoading(false);
       }
@@ -156,12 +151,10 @@ export default function Home() {
     }
   };
 
-  const displayProducts = products.length > 0 ? products : FEATURED_PRODUCTS as any;
-
   const filteredProducts = activeCategory === 'All'
-    ? displayProducts
-    : displayProducts.filter((p: any) => {
-      const catName = typeof p.categoryId === 'object' ? p.categoryId?.name : p.category;
+    ? products
+    : products.filter((p: any) => {
+      const catName = typeof p.category === 'object' ? p.category?.name : p.category;
       return catName === activeCategory;
     });
 
@@ -265,81 +258,102 @@ export default function Home() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-
+          
           {/* Category Filters */}
           <div className="flex flex-wrap gap-2 mb-8">
-            {['All', 'Fresh Fruit', 'Fresh Vegetables'].map((cat) => (
+            <button
+              onClick={() => setActiveCategory('All')}
+              className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${activeCategory === 'All'
+                  ? 'bg-[#3B8524] text-white'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-[#3B8524] hover:text-[#3B8524]'
+                }`}
+            >
+              All
+            </button>
+            {categories.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${activeCategory === cat
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.name)}
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${activeCategory === cat.name
                     ? 'bg-[#3B8524] text-white'
                     : 'bg-white text-gray-600 border border-gray-200 hover:border-[#3B8524] hover:text-[#3B8524]'
                   }`}
               >
-                {cat}
+                {cat.name}
               </button>
             ))}
           </div>
 
           {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.slice(0, 6).map((product: any) => (
-              <div
-                key={product.id || product.id}
-                className="product-card group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300"
-              >
-                <Link to={`/products/${product.id || product.id}`} className="block">
-                  <div className="relative aspect-square overflow-hidden bg-gray-50">
-                    <img
-                      src={product.images?.[0] || product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-[#3B8524]">
-                      {product.category?.name || 'Organic'}
+          {isLoading ? (
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="h-96 bg-gray-100 animate-pulse rounded-2xl" />
+                ))}
+             </div>
+          ) : filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.slice(0, 6).map((product: any) => (
+                <div
+                  key={product.id}
+                  className="product-card group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300"
+                >
+                  <Link to={`/products/${product.id}`} className="block">
+                    <div className="relative aspect-square overflow-hidden bg-gray-50">
+                      <img
+                        src={product.images?.[0] || '/images/placeholder.jpg'}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-[#3B8524]">
+                        {product.category?.name || 'Organic'}
+                      </div>
                     </div>
-                  </div>
-                </Link>
-
-                <div className="p-5">
-                  <Link to={`/products/${product.id || product.id}`}>
-                    <h3 className="text-lg font-semibold text-[#111111] group-hover:text-[#3B8524] transition-colors">
-                      {product.name}
-                    </h3>
                   </Link>
 
-                  <div className="flex items-center gap-1 mt-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < 4 ? 'text-amber-400 fill-amber-400' : 'text-gray-200'
-                          }`}
-                      />
-                    ))}
-                    <span className="text-xs text-gray-400 ml-1">(24)</span>
-                  </div>
+                  <div className="p-5">
+                    <Link to={`/products/${product.id}`}>
+                      <h3 className="text-lg font-semibold text-[#111111] group-hover:text-[#3B8524] transition-colors">
+                        {product.name}
+                      </h3>
+                    </Link>
 
-                  <div className="flex items-end justify-between mt-4">
-                    <div>
-                      <p className="text-2xl font-bold text-[#3B8524]">
-                        Rs. {product.pricePerUnit.toFixed(2)}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        per {product.unit} &middot; Min {product.minimumOrderQty}{product.unit}
-                      </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < 4 ? 'text-amber-400 fill-amber-400' : 'text-gray-200'
+                            }`}
+                        />
+                      ))}
+                      <span className="text-xs text-gray-400 ml-1">(24)</span>
                     </div>
-                    <button
-                      onClick={() => handleAddToCart(product.id || product.id)}
-                      className="p-3 bg-[#3B8524] text-white rounded-xl hover:bg-[#2d6b1b] transition-colors shadow-lg shadow-[#3B8524]/20"
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                    </button>
+
+                    <div className="flex items-end justify-between mt-4">
+                      <div>
+                        <p className="text-2xl font-bold text-[#3B8524]">
+                          Rs. {product.pricePerUnit.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          per {product.unit} &middot; Min {product.minimumOrderQty}{product.unit}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleAddToCart(product.id)}
+                        className="p-3 bg-[#3B8524] text-white rounded-xl hover:bg-[#2d6b1b] transition-colors shadow-lg shadow-[#3B8524]/20"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+               <p className="text-gray-500">No products found. Start by adding some in the admin dashboard.</p>
+            </div>
+          )}
         </div>
       </section>
 

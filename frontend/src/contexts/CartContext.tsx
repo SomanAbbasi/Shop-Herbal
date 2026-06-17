@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { Cart } from '@/types';
 import { cartService } from '@/services/cartService';
 import { toast } from 'sonner';
+import { useAuth } from './AuthContext';
 
 interface CartContextType {
   cart: Cart | null;
@@ -17,10 +18,12 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
+  const { isAuthenticated } = useAuth();
 
   const cartItemsCount = cart?.totalItems || 0;
 
   const fetchCart = useCallback(async () => {
+    if (!isAuthenticated) return;
     try {
       const response = await cartService.getCart();
       if (response.status) {
@@ -29,7 +32,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Silently fail - user might not be logged in
     }
-  }, []);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    } else {
+      setCart(null);
+    }
+  }, [isAuthenticated, fetchCart]);
 
   const addToCart = async (productId: string, quantity: number) => {
     const response = await cartService.addToCart({ productId, quantity });
