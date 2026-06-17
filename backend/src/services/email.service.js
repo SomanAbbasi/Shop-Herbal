@@ -4,20 +4,31 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT),
-  secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+  secure: process.env.SMTP_PORT === '465',
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  // Add these for better deliverability
+  pool: true,
+  maxConnections: 5,
 });
 
-export const sendEmail = async ({ to, subject, html }) => {
-  await transporter.sendMail({
+export const sendEmail = async ({ to, subject, html, text }) => {
+  const info = await transporter.sendMail({
     from: `"Organic Wholesale" <${process.env.SMTP_USER}>`,
     to,
     subject,
+    text: text || html.replace(/<[^>]*>?/gm, ''), // Provide plain text fallback
     html,
+    headers: {
+      'X-Priority': '1',
+      'X-MSMail-Priority': 'High',
+      'Importance': 'high',
+      'List-Unsubscribe': `<mailto:${process.env.SMTP_USER}?subject=unsubscribe>`,
+    },
   });
+  console.log('Email sent: %s', info.messageId);
 };
 
 export const sendOrderNotificationToAdmin = async (order) => {

@@ -40,25 +40,34 @@ export const register = asyncHandler(async (req, res) => {
       to: email,
       subject: 'Verify your email — Organic Wholesale',
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-          <h2 style="color: #3B8524; text-align: center;">Welcome to Organic Wholesale!</h2>
-          <p>Hi ${name},</p>
-          <p>Thank you for registering with Organic Wholesale. To activate your account and start shopping, please verify your email address by clicking the button below:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${verifyUrl}" style="background-color: #3B8524; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email Address</a>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 12px; color: #333; line-height: 1.6;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #3B8524; margin: 0; font-size: 28px;">Organic Wholesale</h1>
+            <p style="color: #666; font-size: 14px; margin-top: 5px;">Pure. Fresh. Local.</p>
           </div>
-          <p>This link will expire in 24 hours. If you did not create an account, please ignore this email.</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="color: #888; font-size: 12px; text-align: center;">&copy; 2026 Organic Wholesale. All rights reserved.</p>
+          <h2 style="color: #111; font-size: 20px; margin-bottom: 20px;">Welcome to the farm, ${name}!</h2>
+          <p>Thank you for choosing Organic Wholesale. We're excited to help you source the finest local produce for your business.</p>
+          <p>To get started, please verify your email address by clicking the button below:</p>
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="${verifyUrl}" style="background-color: #3B8524; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; box-shadow: 0 4px 6px rgba(59, 133, 36, 0.2);">Verify My Account</a>
+          </div>
+          <p style="font-size: 14px; color: #777;">If the button doesn't work, copy and paste this link into your browser:</p>
+          <p style="font-size: 13px; color: #3B8524; word-break: break-all;">${verifyUrl}</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            This link will expire in 24 hours.<br>
+            If you did not sign up for this account, please ignore this email.
+          </p>
         </div>
       `,
     });
   } catch (emailErr) {
+    console.error("Verification email failed:", emailErr);
     await prisma.user.delete({ where: { id: user.id } });
-    return errorResponse(res, 'EMAIL_SEND_FAILED', 'Could not send verification email', 500);
+    return errorResponse(res, 'EMAIL_SEND_FAILED', 'Could not send verification email. Please check your email address.', 500);
   }
 
-  return successResponse(res, null, 'Registration successful. Please verify your email to activate your account.', 201);
+  return successResponse(res, null, 'Registration successful. Please check your email (and spam folder) to verify your account.', 201);
 });
 
 export const verifyEmail = asyncHandler(async (req, res) => {
@@ -144,11 +153,30 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   const resetUrl = `${process.env.CLIENT_URL}/reset-password/${rawToken}`;
   await sendEmail({
     to: user.email,
-    subject: 'Password Reset',
-    html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. Expires in 1 hour.</p>`,
+    subject: 'Reset your password — Organic Wholesale',
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 12px; color: #333; line-height: 1.6;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #3B8524; margin: 0; font-size: 28px;">Organic Wholesale</h1>
+        </div>
+        <h2 style="color: #111; font-size: 20px; margin-bottom: 20px;">Password Reset Request</h2>
+        <p>We received a request to reset the password for your Organic Wholesale account.</p>
+        <p>To choose a new password, click the button below:</p>
+        <div style="text-align: center; margin: 35px 0;">
+          <a href="${resetUrl}" style="background-color: #3B8524; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; box-shadow: 0 4px 6px rgba(59, 133, 36, 0.2);">Reset My Password</a>
+        </div>
+        <p style="font-size: 14px; color: #777;">If the button doesn't work, copy and paste this link into your browser:</p>
+        <p style="font-size: 13px; color: #3B8524; word-break: break-all;">${resetUrl}</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+        <p style="color: #999; font-size: 12px; text-align: center;">
+          This link will expire in 1 hour.<br>
+          If you did not request a password reset, you can safely ignore this email.
+        </p>
+      </div>
+    `,
   });
 
-  return successResponse(res, null, 'Reset link sent if email exists');
+  return successResponse(res, null, 'If an account exists with that email, a reset link has been sent.');
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {

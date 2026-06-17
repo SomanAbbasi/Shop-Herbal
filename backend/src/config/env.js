@@ -12,8 +12,14 @@ required.forEach(key => {
 });
 
 // Extra check for Database URL specifically
-if (process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('postgresql://') && !process.env.DATABASE_URL.startsWith('postgres://')) {
-  throw new Error('CRITICAL ERROR: DATABASE_URL must be a PostgreSQL connection string');
+if (process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL.startsWith('postgresql://') && !process.env.DATABASE_URL.startsWith('postgres://')) {
+    throw new Error('CRITICAL ERROR: DATABASE_URL must be a PostgreSQL connection string');
+  }
+  
+  if (process.env.NODE_ENV === 'production' && (process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('127.0.0.1'))) {
+    throw new Error('CRITICAL ERROR: DATABASE_URL cannot point to localhost in production mode');
+  }
 }
 
 export const env = {

@@ -49,8 +49,6 @@ app.use(
   })
 );
 
-app.options("*", cors());
-
 // 2. Security and Logging
 app.use(helmet());
 app.use(morgan('dev'));
