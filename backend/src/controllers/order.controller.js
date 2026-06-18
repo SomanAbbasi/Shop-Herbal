@@ -44,8 +44,9 @@ export const placeOrder = asyncHandler(async (req, res) => {
         });
       }
 
-      const taxAmount = Math.round(subtotal * 0.05 * 100) / 100;
-      const totalAmount = Math.round((subtotal + taxAmount) * 100) / 100;
+      const taxAmount = 0;
+      const shippingAmount = 150;
+      const totalAmount = Math.round((subtotal + shippingAmount) * 100) / 100;
 
       const count = await tx.order.count();
       const invoiceNumber = `INV-${String(count + 1).padStart(5, '0')}`;
@@ -61,8 +62,9 @@ export const placeOrder = asyncHandler(async (req, res) => {
           country: shippingAddress.country,
           subtotal: Math.round(subtotal * 100) / 100,
           taxAmount,
+          shippingAmount,
           totalAmount,
-          paymentMethod,
+          paymentMethod: 'cash_on_delivery',
           notes: notes || '',
           items: { create: orderItemsData },
         },

@@ -54,7 +54,6 @@ export const sendOrderNotificationToAdmin = async (order) => {
         ${itemsList}
       </table>
       <p><strong>Subtotal:</strong> ${order.subtotal}</p>
-      <p><strong>Tax:</strong> ${order.taxAmount}</p>
       <p><strong>Total:</strong> ${order.totalAmount}</p>
     `,
   });

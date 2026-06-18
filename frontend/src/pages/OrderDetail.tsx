@@ -233,10 +233,12 @@ export default function OrderDetail() {
                   <span className="text-gray-500">Subtotal</span>
                   <span className="font-medium">Rs. {order.subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Tax (5%)</span>
-                  <span className="font-medium">Rs. {order.taxAmount.toFixed(2)}</span>
-                </div>
+                {order.shippingAmount > 0 && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Shipping</span>
+                    <span className="font-medium">Rs. {order.shippingAmount.toFixed(0)}</span>
+                  </div>
+                )}
                 {order.discountAmount > 0 && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-500">Discount</span>
@@ -281,16 +283,6 @@ export default function OrderDetail() {
                   {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
                 </span>
               </div>
-
-              {(order.status === 'pending' || order.status === 'payment_failed') && order.paymentMethod === 'jazz_cash' && (
-                <Link
-                  to="/cart"
-                  state={{ retryOrderId: order.id }}
-                  className="w-full py-2 bg-[#3B8524] text-white rounded-lg text-sm font-medium hover:bg-[#2d6b1b] transition-colors flex items-center justify-center gap-2"
-                >
-                  Pay Now with JazzCash
-                </Link>
-              )}
             </div>
           </div>
         </div>

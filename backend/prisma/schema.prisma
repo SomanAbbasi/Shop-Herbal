@@ -34,11 +34,7 @@ enum PaymentStatus {
 }
 
 enum PaymentMethod {
-  stripe
-  bank_transfer
-  net30
   cash_on_delivery
-  jazz_cash
 }
 
 // ─── USER ────────────────────────────────────────────
@@ -115,6 +111,8 @@ model Product {
   images          String[]
   sku             String   @unique
   unit            String
+  originalPrice   Float    @default(0)
+  discountedPrice Float?
   pricePerUnit    Float
   minimumOrderQty Float    @default(1)
   stock           Float    @default(0)
@@ -192,6 +190,7 @@ model Order {
   subtotal        Float
   taxAmount       Float         @default(0)
   discountAmount  Float         @default(0)
+  shippingAmount  Float         @default(150)
   totalAmount     Float
   status          OrderStatus   @default(pending)
   paymentStatus   PaymentStatus @default(unpaid)

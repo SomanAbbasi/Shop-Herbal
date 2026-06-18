@@ -22,7 +22,8 @@ const EMPTY_PRODUCT = {
   categoryId: '',
   sku: '',
   unit: 'kg',
-  pricePerUnit: '',
+  originalPrice: '',
+  discountedPrice: '',
   minimumOrderQty: '',
   stock: '',
   bulkPricingTiers: [] as { minQty: number; pricePerUnit: number }[],
@@ -78,7 +79,8 @@ export default function AdminProducts() {
     formData.append('categoryId', form.categoryId);
     formData.append('sku', form.sku);
     formData.append('unit', form.unit);
-    formData.append('pricePerUnit', form.pricePerUnit);
+    formData.append('originalPrice', form.originalPrice);
+    if (form.discountedPrice) formData.append('discountedPrice', form.discountedPrice);
     formData.append('minimumOrderQty', form.minimumOrderQty);
     formData.append('stock', form.stock);
 
@@ -152,7 +154,8 @@ export default function AdminProducts() {
       categoryId: typeof product.categoryId === 'object' ? product.categoryId.id : product.categoryId,
       sku: product.sku,
       unit: product.unit,
-      pricePerUnit: product.pricePerUnit.toString(),
+      originalPrice: product.originalPrice.toString(),
+      discountedPrice: product.discountedPrice?.toString() || '',
       minimumOrderQty: product.minimumOrderQty.toString(),
       stock: product.stock.toString(),
       bulkPricingTiers: product.bulkPricingTiers || [],
@@ -303,14 +306,25 @@ export default function AdminProducts() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price per Unit *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Original Price *</label>
                   <input
                     type="number"
                     required
                     min="0"
                     step="0.01"
-                    value={form.pricePerUnit}
-                    onChange={(e) => setForm({ ...form, pricePerUnit: e.target.value })}
+                    value={form.originalPrice}
+                    onChange={(e) => setForm({ ...form, originalPrice: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Discounted Price (Optional)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.discountedPrice}
+                    onChange={(e) => setForm({ ...form, discountedPrice: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
                   />
                 </div>

@@ -305,8 +305,15 @@ export default function Home() {
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-[#3B8524]">
-                        {product.category?.name || 'Organic'}
+                      <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+                        <div className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-medium text-[#3B8524] uppercase tracking-wider">
+                          {product.category?.name || 'Organic'}
+                        </div>
+                        {product.discountedPrice && product.discountedPrice < product.originalPrice && (
+                          <div className="px-2 py-1 bg-red-600 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider shadow-sm">
+                            {Math.round(((product.originalPrice - product.discountedPrice) / product.originalPrice) * 100)}% OFF
+                          </div>
+                        )}
                       </div>
                     </div>
                   </Link>
@@ -331,9 +338,16 @@ export default function Home() {
 
                     <div className="flex items-end justify-between mt-4">
                       <div>
-                        <p className="text-2xl font-bold text-[#3B8524]">
-                          Rs. {product.pricePerUnit.toFixed(2)}
-                        </p>
+                        <div className="flex items-baseline gap-2">
+                          <p className="text-2xl font-bold text-[#3B8524]">
+                            Rs. {product.pricePerUnit.toFixed(0)}
+                          </p>
+                          {product.discountedPrice && product.discountedPrice < product.originalPrice && (
+                            <p className="text-sm text-gray-400 line-through">
+                              Rs. {product.originalPrice.toFixed(0)}
+                            </p>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500">
                           per {product.unit} &middot; Min {product.minimumOrderQty}{product.unit}
                         </p>

@@ -1,5 +1,5 @@
 export const calculatePrice = (product, quantity) => {
-  let price = product.pricePerUnit;
+  let price = product.pricePerUnit || product.discountedPrice || product.originalPrice;
   if (product.bulkPricingTiers && product.bulkPricingTiers.length > 0) {
     const sorted = [...product.bulkPricingTiers].sort((a, b) => b.minQty - a.minQty);
     for (const tier of sorted) {

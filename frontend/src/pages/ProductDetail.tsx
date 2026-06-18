@@ -189,10 +189,20 @@ export default function ProductDetail() {
 
             {/* Pricing */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-8">
-              <div className="flex items-baseline gap-2 mb-4">
+              <div className="flex items-center flex-wrap gap-3 mb-4">
                 <span className="text-4xl font-bold text-[#3B8524]">
-                  Rs. {getBulkPrice().toFixed(2)}
+                  Rs. {getBulkPrice().toFixed(0)}
                 </span>
+                {product.discountedPrice && product.discountedPrice < product.originalPrice && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl text-gray-400 line-through">
+                      Rs. {product.originalPrice.toFixed(0)}
+                    </span>
+                    <span className="px-2 py-1 bg-red-600 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
+                      {Math.round(((product.originalPrice - product.discountedPrice) / product.originalPrice) * 100)}% OFF
+                    </span>
+                  </div>
+                )}
                 <span className="text-gray-500">/ {product.unit}</span>
               </div>
 
@@ -273,11 +283,11 @@ export default function ProductDetail() {
             <div className="grid grid-cols-3 gap-4">
               <div className="flex flex-col items-center text-center p-4 bg-white rounded-xl border border-gray-100">
                 <Truck className="w-6 h-6 text-[#3B8524] mb-2" />
-                <span className="text-xs font-medium text-gray-600">Free Shipping</span>
+                <span className="text-xs font-medium text-gray-600">Flat Rs. 150 Shipping</span>
               </div>
               <div className="flex flex-col items-center text-center p-4 bg-white rounded-xl border border-gray-100">
                 <ShieldCheck className="w-6 h-6 text-[#3B8524] mb-2" />
-                <span className="text-xs font-medium text-gray-600">Certified Organic</span>
+                <span className="text-xs font-medium text-gray-600">COD Available</span>
               </div>
               <div className="flex flex-col items-center text-center p-4 bg-white rounded-xl border border-gray-100">
                 <Package className="w-6 h-6 text-[#3B8524] mb-2" />

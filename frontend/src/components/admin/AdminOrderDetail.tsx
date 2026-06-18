@@ -193,10 +193,6 @@ export default function AdminOrderDetail({ orderId, onClose }: AdminOrderDetailP
                     <span className="text-gray-500">Subtotal</span>
                     <span className="font-medium">Rs. {order.subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Tax (5%)</span>
-                    <span className="font-medium">Rs. {order.taxAmount.toFixed(2)}</span>
-                  </div>
                   {order.discountAmount > 0 && (
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-500">Discount</span>

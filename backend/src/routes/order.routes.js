@@ -9,12 +9,10 @@ import { placeOrderSchema, updateOrderStatusSchema } from '../validations/order.
 const router = Router();
 
 router.use(authenticate);
-router.post('/', placeOrder);
+router.post('/', validateRequest(placeOrderSchema), placeOrder);
 router.get('/', listOrders);
 router.get('/:id', getOrder);
 router.post('/:id/cancel', cancelOrder);
-router.patch('/:id/status', authorizeRole('admin'), updateOrderStatus);
-router.post('/', validateRequest(placeOrderSchema), placeOrder);
 router.patch('/:id/status', authorizeRole('admin'), validateRequest(updateOrderStatusSchema), updateOrderStatus);
 
 

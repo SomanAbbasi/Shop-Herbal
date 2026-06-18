@@ -120,7 +120,9 @@ export const createProduct = asyncHandler(async (req, res) => {
   const product = await prisma.product.create({
     data: {
       ...rest,
-      pricePerUnit: Number(rest.pricePerUnit),
+      originalPrice: Number(rest.originalPrice),
+      discountedPrice: rest.discountedPrice ? Number(rest.discountedPrice) : null,
+      pricePerUnit: Number(rest.discountedPrice || rest.originalPrice),
       minimumOrderQty: Number(rest.minimumOrderQty),
       stock: Number(rest.stock),
       images: imageUrls,
@@ -149,7 +151,14 @@ export const updateProduct = asyncHandler(async (req, res) => {
     data.images = imageUrls;
   }
 
-  if (data.pricePerUnit) data.pricePerUnit = Number(data.pricePerUnit);
+  if (data.originalPrice) data.originalPrice = Number(data.originalPrice);
+  if (data.discountedPrice !== undefined) data.discountedPrice = data.discountedPrice ? Number(data.discountedPrice) : null;
+  
+  // Update pricePerUnit based on new prices or existing ones
+  const op = data.originalPrice || product.originalPrice;
+  const dp = data.discountedPrice !== undefined ? data.discountedPrice : product.discountedPrice;
+  data.pricePerUnit = Number(dp || op);
+
   if (data.minimumOrderQty) data.minimumOrderQty = Number(data.minimumOrderQty);
   if (data.stock) data.stock = Number(data.stock);
 

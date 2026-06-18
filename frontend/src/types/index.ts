@@ -76,6 +76,8 @@ export interface Product {
   images: string[];
   sku: string;
   unit: string;
+  originalPrice: number;
+  discountedPrice: number | null;
   pricePerUnit: number;
   minimumOrderQty: number;
   stock: number;
@@ -143,6 +145,7 @@ export interface Order {
   country: string;
   subtotal: number;
   taxAmount: number;
+  shippingAmount: number;
   discountAmount: number;
   totalAmount: number;
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'payment_failed';
@@ -213,7 +216,7 @@ export interface PlaceOrderBody {
     postalCode: string;
     country: string;
   };
-  paymentMethod: 'stripe' | 'bank_transfer' | 'net30' | 'cash_on_delivery' | 'jazz_cash';
+  paymentMethod: 'cash_on_delivery';
   notes?: string;
 }
 
