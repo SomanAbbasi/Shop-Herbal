@@ -50,7 +50,7 @@ export default function AdminProducts() {
     setIsLoading(true);
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        productService.listProducts({ page, limit: 10, search: search || undefined }),
+        productService.listProducts({ page, limit: 10, search: search || undefined, isActive: 'all' }),
         categoryService.listCategories(),
       ]);
       if (productsRes.status) {
@@ -117,11 +117,16 @@ export default function AdminProducts() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure? This will soft-delete the product.')) return;
+  const handleDelete = async (product: Product) => {
+    const isInactive = !product.isActive;
+    const message = isInactive 
+      ? 'Are you sure? This will PERMANENTLY delete the product and its data.'
+      : 'Are you sure? This will soft-delete the product.';
+      
+    if (!confirm(message)) return;
     try {
-      await productService.deleteProduct(id);
-      toast.success('Product deleted');
+      await productService.deleteProduct(product.id);
+      toast.success(isInactive ? 'Product permanently deleted' : 'Product soft-deleted');
       fetchData();
     } catch {
       toast.error('Failed to delete product');
@@ -495,7 +500,7 @@ export default function AdminProducts() {
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(product.id)}
+                          onClick={() => handleDelete(product)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >

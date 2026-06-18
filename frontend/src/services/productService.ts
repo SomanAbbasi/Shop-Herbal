@@ -9,6 +9,7 @@ interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   sortBy?: 'price_asc' | 'price_desc' | 'newest';
+  isActive?: 'true' | 'false' | 'all';
 }
 
 export const productService = {
@@ -21,6 +22,7 @@ export const productService = {
     if (filters.minPrice) params.append('minPrice', filters.minPrice.toString());
     if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
     if (filters.sortBy) params.append('sortBy', filters.sortBy);
+    if (filters.isActive) params.append('isActive', filters.isActive);
     const response = await api.get<PaginatedResponse<Product>>(`/products?${params.toString()}`);
     return response.data;
   },

@@ -18,9 +18,19 @@ const uploadToCloudinary = (buffer, folder) => {
 };
 
 export const listProducts = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, search, categoryId, minPrice, maxPrice, sortBy, featured } = req.query;
+  const { page = 1, limit = 10, search, categoryId, minPrice, maxPrice, sortBy, featured, isActive } = req.query;
 
-  const where = { isActive: true };
+  const where = {};
+  
+  // Handle isActive filter: 'true', 'false', or 'all'
+  if (isActive === 'all') {
+    // No filter on isActive
+  } else if (isActive === 'false') {
+    where.isActive = false;
+  } else {
+    where.isActive = true; // Default to active products only
+  }
+
   if (search) {
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
@@ -66,7 +76,7 @@ export const getProduct = asyncHandler(async (req, res) => {
     },
   });
 
-  if (!product || !product.isActive)
+  if (!product)
     return errorResponse(res, 'PRODUCT_NOT_FOUND', 'Product not found', 404);
 
   return successResponse(res, product);
@@ -74,7 +84,7 @@ export const getProduct = asyncHandler(async (req, res) => {
 
 export const createProduct = asyncHandler(async (req, res) => {
   const { bulkPricingTiers, ...rest } = req.body;
-  console.log(req.body);
+  
   const imageUrls = [];
   if (req.files && req.files.length > 0) {
     for (const file of req.files) {
@@ -164,8 +174,15 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   const product = await prisma.product.findUnique({ where: { id: req.params.id } });
   if (!product) return errorResponse(res, 'PRODUCT_NOT_FOUND', 'Product not found', 404);
 
+  if (!product.isActive) {
+    // If already inactive, permanently delete
+    await prisma.product.delete({ where: { id: req.params.id } });
+    return successResponse(res, null, 'Product permanently deleted');
+  }
+
+  // Soft delete
   await prisma.product.update({ where: { id: req.params.id }, data: { isActive: false } });
-  return successResponse(res, null, 'Product deleted');
+  return successResponse(res, null, 'Product soft-deleted');
 });
 
 export const activateProduct = asyncHandler(async (req, res) => {

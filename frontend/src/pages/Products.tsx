@@ -34,7 +34,7 @@ export default function Products() {
   );
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
 
   // Sync state with search params (e.g. when navigating from Navbar)
   useEffect(() => {
@@ -43,6 +43,7 @@ export default function Products() {
     setSortBy((searchParams.get('sortBy') as any) || '');
     setMinPrice(searchParams.get('minPrice') || '');
     setMaxPrice(searchParams.get('maxPrice') || '');
+    setPage(parseInt(searchParams.get('page') || '1'));
   }, [searchParams]);
 
   useEffect(() => {
@@ -85,13 +86,22 @@ export default function Products() {
     fetchProducts();
   }, [page, search, selectedCategory, sortBy, minPrice, maxPrice]);
 
+  const updateQueryParams = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '') {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    params.set('page', '1');
+    setSearchParams(params);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setPage(1);
-    const params = new URLSearchParams(searchParams);
-    if (search) params.set('search', search);
-    else params.delete('search');
-    setSearchParams(params);
+    updateQueryParams({ search });
   };
 
   const handleAddToCart = async (productId: string, minQty: number) => {
@@ -159,7 +169,7 @@ export default function Products() {
             <div className="relative">
               <select
                 value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value as any); setPage(1); }}
+                onChange={(e) => updateQueryParams({ sortBy: e.target.value })}
                 className="appearance-none px-5 py-3 pr-10 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30 cursor-pointer"
               >
                 <option value="">Sort by</option>
@@ -180,7 +190,7 @@ export default function Products() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                 <select
                   value={selectedCategory}
-                  onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
+                  onChange={(e) => updateQueryParams({ categoryId: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
                 >
                   <option value="">All Categories</option>
@@ -198,7 +208,8 @@ export default function Products() {
                   type="number"
                   placeholder="$0"
                   value={minPrice}
-                  onChange={(e) => { setMinPrice(e.target.value); setPage(1); }}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  onBlur={(e) => updateQueryParams({ minPrice: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
                 />
               </div>
@@ -209,7 +220,8 @@ export default function Products() {
                   type="number"
                   placeholder="Rs. 999"
                   value={maxPrice}
-                  onChange={(e) => { setMaxPrice(e.target.value); setPage(1); }}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  onBlur={(e) => updateQueryParams({ maxPrice: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B8524]/30"
                 />
               </div>
@@ -235,7 +247,7 @@ export default function Products() {
             {search && (
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E6F6CA] text-[#3B8524] text-sm rounded-full">
                 Search: {search}
-                <button onClick={() => { setSearch(''); setPage(1); }}>
+                <button onClick={() => updateQueryParams({ search: null })}>
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -243,7 +255,7 @@ export default function Products() {
             {selectedCategory && (
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E6F6CA] text-[#3B8524] text-sm rounded-full">
                 {categories.find((c) => c.id === selectedCategory)?.name || 'Category'}
-                <button onClick={() => { setSelectedCategory(''); setPage(1); }}>
+                <button onClick={() => updateQueryParams({ categoryId: null })}>
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -251,7 +263,7 @@ export default function Products() {
             {sortBy && (
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E6F6CA] text-[#3B8524] text-sm rounded-full">
                 {sortBy === 'price_asc' ? 'Price: Low to High' : sortBy === 'price_desc' ? 'Price: High to Low' : 'Newest'}
-                <button onClick={() => { setSortBy(''); setPage(1); }}>
+                <button onClick={() => updateQueryParams({ sortBy: null })}>
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -363,7 +375,12 @@ export default function Products() {
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-12">
                 <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  onClick={() => {
+                    const next = Math.max(1, page - 1);
+                    const params = new URLSearchParams(searchParams);
+                    params.set('page', next.toString());
+                    setSearchParams(params);
+                  }}
                   disabled={page === 1}
                   className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium disabled:opacity-50 hover:border-[#3B8524] hover:text-[#3B8524] transition-colors"
                 >
@@ -372,7 +389,11 @@ export default function Products() {
                 {[...Array(totalPages)].map((_, i) => (
                   <button
                     key={i}
-                    onClick={() => setPage(i + 1)}
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams);
+                      params.set('page', (i + 1).toString());
+                      setSearchParams(params);
+                    }}
                     className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
                       page === i + 1
                         ? 'bg-[#3B8524] text-white'
@@ -383,7 +404,12 @@ export default function Products() {
                   </button>
                 ))}
                 <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() => {
+                    const next = Math.min(totalPages, page + 1);
+                    const params = new URLSearchParams(searchParams);
+                    params.set('page', next.toString());
+                    setSearchParams(params);
+                  }}
                   disabled={page === totalPages}
                   className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium disabled:opacity-50 hover:border-[#3B8524] hover:text-[#3B8524] transition-colors"
                 >
