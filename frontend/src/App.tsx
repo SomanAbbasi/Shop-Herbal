@@ -17,6 +17,11 @@ import Profile from '@/pages/Profile';
 import Cart from '@/pages/Cart';
 import Orders from '@/pages/Orders';
 import OrderDetail from '@/pages/OrderDetail';
+import AboutUs from '@/pages/AboutUs';
+import ShippingInfo from '@/pages/ShippingInfo';
+import ContactUs from '@/pages/ContactUs';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import TermsOfService from '@/pages/TermsOfService';
 import AdminDashboard from '@/pages/admin/Dashboard';
 import AdminProducts from '@/pages/admin/Products';
 import AdminCategories from '@/pages/admin/Categories';
@@ -92,6 +97,11 @@ function AppRoutes() {
             </PrivateRoute>
           }
         />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/shipping-info" element={<ShippingInfo />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
       </Route>
 
       <Route

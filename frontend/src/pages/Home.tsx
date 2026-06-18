@@ -219,10 +219,7 @@ export default function Home() {
 
           {/* Quick Stats */}
           <div className="flex flex-wrap items-center justify-center gap-8 mt-12">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Truck className="w-4 h-4 text-[#3B8524]" />
-              <span>Free shipping over Rs. 500</span>
-            </div>
+            
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <ShieldCheck className="w-4 h-4 text-[#3B8524]" />
               <span>Certified Organic</span>
