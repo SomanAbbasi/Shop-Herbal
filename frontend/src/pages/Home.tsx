@@ -15,7 +15,6 @@ import {
   ShoppingCart,
   ChevronRight,
   Leaf,
-  Truck,
   ShieldCheck,
   Clock,
 } from 'lucide-react';
