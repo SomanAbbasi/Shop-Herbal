@@ -21,7 +21,13 @@ export const listProducts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, search, categoryId, minPrice, maxPrice, sortBy, featured } = req.query;
 
   const where = { isActive: true };
-  if (search) where.name = { contains: search, mode: 'insensitive' };
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: 'insensitive' } },
+      { description: { contains: search, mode: 'insensitive' } },
+      { sku: { contains: search, mode: 'insensitive' } },
+    ];
+  }
   if (categoryId) where.categoryId = categoryId;
   if (minPrice || maxPrice) {
     where.pricePerUnit = {};

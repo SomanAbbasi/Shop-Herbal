@@ -36,6 +36,15 @@ export default function Products() {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [page, setPage] = useState(1);
 
+  // Sync state with search params (e.g. when navigating from Navbar)
+  useEffect(() => {
+    setSearch(searchParams.get('search') || '');
+    setSelectedCategory(searchParams.get('categoryId') || '');
+    setSortBy((searchParams.get('sortBy') as any) || '');
+    setMinPrice(searchParams.get('minPrice') || '');
+    setMaxPrice(searchParams.get('maxPrice') || '');
+  }, [searchParams]);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {

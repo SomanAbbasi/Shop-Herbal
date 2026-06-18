@@ -75,8 +75,9 @@ export default function AdminCategories() {
       await categoryService.deleteCategory(id);
       toast.success('Category deleted');
       fetchCategories();
-    } catch {
-      toast.error('Failed to delete category');
+    } catch (err: any) {
+      const message = err?.response?.data?.error?.message || 'Failed to delete category';
+      toast.error(message);
     }
   };
 

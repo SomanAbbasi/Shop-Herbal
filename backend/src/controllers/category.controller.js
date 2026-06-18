@@ -58,8 +58,36 @@ export const updateCategory = asyncHandler(async (req, res) => {
 });
 
 export const deleteCategory = asyncHandler(async (req, res) => {
-  const category = await prisma.category.findUnique({ where: { id: req.params.id } });
-  if (!category) return errorResponse(res, 'NOT_FOUND', 'Category not found', 404);
+  const category = await prisma.category.findUnique({
+    where: { id: req.params.id },
+    include: {
+      _count: {
+        select: { products: true, children: true },
+      },
+    },
+  });
+
+  if (!category) {
+    return errorResponse(res, 'NOT_FOUND', 'Category not found', 404);
+  }
+
+  if (category._count.products > 0) {
+    return errorResponse(
+      res,
+      'CATEGORY_HAS_PRODUCTS',
+      `Cannot delete category "${category.name}" because it contains ${category._count.products} products. Please move or delete the products first.`,
+      400
+    );
+  }
+
+  if (category._count.children > 0) {
+    return errorResponse(
+      res,
+      'CATEGORY_HAS_CHILDREN',
+      `Cannot delete category "${category.name}" because it has ${category._count.children} subcategories. Please delete the subcategories first.`,
+      400
+    );
+  }
 
   await prisma.category.delete({ where: { id: req.params.id } });
   return successResponse(res, null, 'Category deleted');
